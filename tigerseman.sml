@@ -44,6 +44,7 @@ fun tiposIguales (TRecord _) TNil = true
   | tiposIguales TNil (TRecord _) = true 
   | tiposIguales (TRecord (_, u1)) (TRecord (_, u2 )) = (u1=u2)
   | tiposIguales (TArray (_, u1)) (TArray (_, u2)) = (u1=u2)
+  | tiposIguales (TInt _) (TInt _)= true
   | tiposIguales a b = (a=b)
 
 fun error(s, p) = raise Fail ("Error -- línea "^Int.toString(p)^": "^s^"\n")
