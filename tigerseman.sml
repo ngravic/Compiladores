@@ -131,7 +131,14 @@ fun transExp(venv, tenv) =
 				val {exp, ty=tipo} = hd(rev lexti)
 			in	{ exp=SCAF, ty=tipo } end
 		| trexp(AssignExp({var=SimpleVar s, exp}, nl)) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
+      (case tabBusca(s, tenv) of
+        SOME (TInt RO) => error("Error de intento de asignacion de valor a variable RO",nl)
+        |SOME x         => if not (tiposIguales x (#ty (trexp exp)) )
+                          then error("Error de tipado asignación de variable",nl)
+                          else {exp=SCAF, ty=TUnit}
+        |_              => error("La variable" ^ s ^ "no fue declarada", nl)
+      ) 
+
 		| trexp(AssignExp({var, exp}, nl)) =
 			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
 		| trexp(IfExp({test, then', else'=SOME else'}, nl)) =
