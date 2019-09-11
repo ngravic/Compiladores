@@ -181,7 +181,18 @@ fun transExp(venv, tenv) =
 				else error("El cuerpo de un while no puede devolver un valor", nl)
 			end
 		| trexp(ForExp({var, escape, lo, hi, body}, nl)) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
+			let val newvenv = tabRInserta(var,Var{ty = TInt RO},venv)		(*Defino un nuevo entorno de trabajo que incluye el iterador declarado*)
+		    	val {exp = explo,ty = tylo } = trexp lo
+				val {exp = explhi,ty = tyhi} = trexp hi
+				val {exp = expbody,ty = tybody} = transExp(newvenv,tenv) (body) (*Tipado del body con el nuevo entorno de varables, incluye iterador*)
+				
+			in
+				if tiposIguales (tylo)(TInt RW) andalso tiposIguales (tyhi)(TInt RW)
+				then (if tiposIguales (tybody) (TUnit) 
+					then {exp = SCAF, ty = TUnit}
+					else error("Error de tipado en cuerpo del for",nl))
+				else error("Tipo de extremos del for no Enteros",nl)
+			end
 		| trexp(LetExp({decs, body}, _)) =
 			let
 				val (venv', tenv', _) = List.foldl (fn (d, (v, t, _)) => trdec(v, t) d) (venv, tenv, []) decs
