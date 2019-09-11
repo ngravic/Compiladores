@@ -139,8 +139,23 @@ fun transExp(venv, tenv) =
         |_              => error("La variable" ^ s ^ "no fue declarada", nl)
       ) 
 
-		| trexp(AssignExp({var, exp}, nl)) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
+		| trexp(AssignExp({var= (fv as FieldVar (v,s)), exp}, nl)) =
+				let val tipov = (#ty (trvar (fv,nl)))
+					val tipoexp = (#ty (trexp exp))
+				in
+					if tiposIguales (tipov)(tipoexp)
+					then {exp = SCAF, ty = tipov}
+					else error("Error de tipado de variable",nl)
+				end
+		| trexp(AssignExp({var=(sv as SubscriptVar (v,e)),exp},nl)) =  (*v es el "identificador" del arreglo, e es el indice, exp es la expresion a asignar*)
+				let val tipoexp = (#ty (trexp exp))
+					val tipov = (#ty (trvar (sv,nl)))
+					val tipoe = (#ty (trexp e))
+				in
+					if tiposIguales (tipov)(tipoexp) andalso tiposIguales (tipoe) (TInt RW)
+					then {exp = SCAF, ty = tipov }
+					else error("Error de asignación de tipo al elemento del arreglo",nl)
+				end			
 		| trexp(IfExp({test, then', else'=SOME else'}, nl)) =
 			let val {exp=testexp, ty=tytest} = trexp test
 			    val {exp=thenexp, ty=tythen} = trexp then'
