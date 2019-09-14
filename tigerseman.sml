@@ -201,9 +201,22 @@ fun transExp(venv, tenv) =
 				{exp=SCAF, ty=tybody}
 			end
 		| trexp(BreakExp nl) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
+			{exp=SCAF, ty=TUnit}
 		| trexp(ArrayExp({typ, size, init}, nl)) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
+			let val {exp = sizexp, ty = tysize} = trexp(size)
+                val tytyp = tabBusca(typ,tenv)
+                val {exp =initxp, ty = tyinit } = trexp(init)
+            in if tiposIguales(tysize)(TInt RO)
+               then (
+                    case tytyp of 
+                    NONE => error("El tipo que define el arreglo no fue declarado",nl)
+                    | SOME x => if tiposIguales(x)(tyinit)
+                              then {exp=SCAF , ty= TUnit}
+                              else error("El tipo del valor inicial no coincide con el del arreglo",nl)
+               )
+               else error("El declarador de tamaño de arreglo no es Entero",nl)
+
+            end
 		and trvar(SimpleVar s, nl) =
 			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
 		| trvar(FieldVar(v, s), nl) =
