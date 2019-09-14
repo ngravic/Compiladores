@@ -218,7 +218,10 @@ fun transExp(venv, tenv) =
 
             end
 		and trvar(SimpleVar s, nl) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
+            (case tabBusca(s,venv) of
+                NONE => error("Variable Simple no declarada",nl)
+                |SOME (Var x) => {exp = SCAF, ty = (#ty x)}
+                |SOME _ => error("No se trata de una variable sino de una función",nl))
 		| trvar(FieldVar(v, s), nl) =
 			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
 		| trvar(SubscriptVar(v, e), nl) =
