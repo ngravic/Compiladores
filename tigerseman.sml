@@ -223,7 +223,7 @@ fun transExp(venv, tenv) =
 
             end
 		and trvar(SimpleVar s, nl) =
-            (case tabBusca(s,venv) of
+            (case (tabBusca(s,venv)) of
                 NONE => error("Variable Simple no declarada",nl)
                 |SOME (Var x) => {exp = SCAF, ty = (#ty x)}
                 |SOME _ => error("No se trata de una variable sino de una función",nl))
@@ -232,11 +232,27 @@ fun transExp(venv, tenv) =
                                          | _ => error("Intentando acceder a un registro de algo que no es record",nl))
                                           
 		| trvar(SubscriptVar(v, e), nl) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
-		and trdec (venv, tenv) (VarDec ({name,escape,typ=NONE,init},pos)) = 
-			(venv, tenv, []) (*COMPLETAR*)
+            (case (#ty (trexp(e))) of
+            TInt _ =>(case #ty (trvar(v,nl)) of
+                    TArray (t,_) => {exp = SCAF, ty = !t}
+                    |_ => error("Intento de acceso a algo que no es un array",nl))
+            |_ => error("El indice del arreglo no evalúa a un entero",nl))
+		and trdec (venv, tenv) (VarDec ({name,escape,typ=NONE,init},pos)) =
+                let val tipoinit = #ty (trexp (init))
+                in if tiposIguales (tipoinit) (TNil)
+                then error("No se puede asignar Nil a una varbiable sin especifcar su tipo",pos)
+                else
+                ((tabInserta (name,Var {ty = tipoinit}, venv)),tenv,[])
+                end
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
-			(venv, tenv, []) (*COMPLETAR*)
+			let val tipoinit = (#ty (trexp(init)))
+                val tipos = tabBusca(s,tenv)
+            in (case tipos of
+                NONE => error("No existe el tipo que se intenta declarar",pos)
+                |SOME x =>   if tiposIguales (tipoinit)(x)
+                    then (tabInserta(name,Var {ty=tipoinit},venv),tenv,[])
+                    else error("El valor que quiere asignar no coincide con el tipo de la variable",pos))
+            end
 		| trdec (venv,tenv) (FunctionDec fs) =
 			(venv, tenv, []) (*COMPLETAR*)
 		| trdec (venv,tenv) (TypeDec ts) =
