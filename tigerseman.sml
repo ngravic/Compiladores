@@ -4,6 +4,7 @@ struct
 open tigerabs
 open tigersres
 open tigertrans
+open tigertopsort
 open ListPair
 open List
 
@@ -250,13 +251,13 @@ fun transExp(venv, tenv) =
             in (case tipos of
                 NONE => error("No existe el tipo que se intenta declarar",pos)
                 |SOME x =>   if tiposIguales (tipoinit)(x)
-                    then (tabInserta(name,Var {ty=tipoinit},venv),tenv,[])
+                    then (tabRInserta(name,Var {ty=tipoinit},venv),tenv,[])
                     else error("El valor que quiere asignar no coincide con el tipo de la variable",pos))
             end
-		| trdec (venv,tenv) (FunctionDec fs) =
-			(venv, tenv, []) (*COMPLETAR*)
-		| trdec (venv,tenv) (TypeDec ts) =
-			(venv, tenv, []) (*COMPLETAR*)
+		| trdec (venv,tenv) (FunctionDec fs) = (venv, tenv, []) (*COMPLETAR*)
+		| trdec (venv,tenv) (TypeDec ts) = let val nopos = map (#1) ts
+                                           in (venv, tenv, [])
+                                           end
 	in trexp end
 fun transProg ex =
 	let	val main =
