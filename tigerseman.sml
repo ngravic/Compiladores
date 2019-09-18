@@ -9,6 +9,12 @@ open List
 
 type expty = {exp: exp, ty: Tipo}
 
+fun error(s, p) = raise Fail ("Error -- línea "^Int.toString(p)^": "^s^"\n")
+
+fun recBusca s ((x,y,z)::xs) nv = if s = x then {exp=SCAF, ty= !y}
+                                  else recBusca s xs nv
+  | recBusca s [] nv = error("COMPLETAR", nv)
+
 type venv = (string, EnvEntry) tigertab.Tabla
 type tenv = (string, Tipo) tigertab.Tabla
 
@@ -47,7 +53,6 @@ fun tiposIguales (TRecord _) TNil = true
   | tiposIguales (TInt _) (TInt _)= true
   | tiposIguales a b = (a=b)
 
-fun error(s, p) = raise Fail ("Error -- línea "^Int.toString(p)^": "^s^"\n")
 
 fun igualesArgs(formals, args, nl) = 
   (filter (fn (x, y) => (not (tiposIguales x y))) (zipEq (formals,args))) = []
@@ -222,8 +227,10 @@ fun transExp(venv, tenv) =
                 NONE => error("Variable Simple no declarada",nl)
                 |SOME (Var x) => {exp = SCAF, ty = (#ty x)}
                 |SOME _ => error("No se trata de una variable sino de una función",nl))
-		| trvar(FieldVar(v, s), nl) =
-			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
+		| trvar(FieldVar(v, s), nl) = (case #ty (trvar (v,nl)) of
+                                         TRecord (tv, _) => recBusca s tv nl
+                                         | _ => error("Intentando acceder a un registro de algo que no es record",nl))
+                                          
 		| trvar(SubscriptVar(v, e), nl) =
 			{exp=SCAF, ty=TUnit} (*COMPLETAR*)
 		and trdec (venv, tenv) (VarDec ({name,escape,typ=NONE,init},pos)) = 
@@ -245,3 +252,5 @@ fun transProg ex =
 
 	in	print "bien!\n" end
 end
+
+
