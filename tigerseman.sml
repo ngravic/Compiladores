@@ -257,16 +257,25 @@ fun transExp(venv, tenv) =
                     else error("El valor que quiere asignar no coincide con el tipo de la variable",pos))
             end
 		| trdec (venv,tenv) (FunctionDec fs) =
-			let val cleanlist = map (fn ({name, params, result, ...}, pos) => (name,params,result,pos)) fs
-				fun	funcionaux ((name,params,result,position),venv)= 
+			let 
+        fun tabBusca2  t e = tabBusca(e, t)
+        val cleanlist      = map (fn ({name, params, result, ...}, pos) => (name,params,result,pos)) fs
+        val bodylist       = map (fn ({name, params, result, body},pos) => (name,params,result,body,pos)) fs
+        val param_ty_name  = map #typ params
+        val param_ty       = map (tabBusca2 tenv) param_ty_name
+        if filter (fn (a) => a==NONE) param_ty != [] then error("No se encontraron los tipos", -5) else 
+        val 
+        fun	funcionaux ((name,params,result,position),venv)= 
 						(case result of 
-							NONE => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = [], result = TUnit, extern = false}, venv)
+							NONE => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = param_ty, result = TUnit, extern = false}, venv)
 							|SOME t => (case tabBusca (t,tenv) of
 												NONE => error("Tipo de retorno de funcion no encontrado",position)
-												|SOME x => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = [], result = x, extern = false}, venv)
+												|SOME x => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = param_ty, result = x, extern = false}, venv)
 										)
 						)
-			in (foldl funcionaux venv cleanlist , tenv, [])
+		  	val prevenv  = (foldl funcionaux venv cleanlist)
+        val temp_env = foldl (fn 
+      in (prevenv, tenv, [])            
 			end
 
 		| trdec (venv,tenv) (TypeDec ts) = let val nopos = map (#1) ts
