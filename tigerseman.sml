@@ -7,6 +7,8 @@ open tigertrans
 open tigertopsort
 open ListPair
 open List
+open tigertemp
+
 
 type expty = {exp: exp, ty: Tipo}
 
@@ -243,7 +245,7 @@ fun transExp(venv, tenv) =
                 in if tiposIguales (tipoinit) (TNil)
                 then error("No se puede asignar Nil a una varbiable sin especifcar su tipo",pos)
                 else
-                ((tabInserta (name,Var {ty = tipoinit}, venv)),tenv,[])
+                ((tabRInserta (name,Var {ty = tipoinit}, venv)),tenv,[])
                 end
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
 			let val tipoinit = (#ty (trexp(init)))
@@ -254,7 +256,19 @@ fun transExp(venv, tenv) =
                     then (tabRInserta(name,Var {ty=tipoinit},venv),tenv,[])
                     else error("El valor que quiere asignar no coincide con el tipo de la variable",pos))
             end
-		| trdec (venv,tenv) (FunctionDec fs) = (venv, tenv, []) (*COMPLETAR*)
+		| trdec (venv,tenv) (FunctionDec fs) =
+			let val cleanlist = map  (fn {name, params, result, ...} => (name,params,result)) (map (#1) fs)
+				fun	funcionaux ({name,params,result,body},position) (venv) =
+						(case result of 
+							NONE => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = [], result = TUnit, extern = false}, venv)
+							|SOME t => (case tabBusca (t,tenv) of
+												NONE => error("Tipo de retorno de funcion no encontrado",position)
+												|SOME x => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = [], result = x, extern = false}, venv)
+										)
+						)
+			in  (venv, tenv, [])
+			end
+
 		| trdec (venv,tenv) (TypeDec ts) = let val nopos = map (#1) ts
                                            in (venv, tenv, [])
                                            end

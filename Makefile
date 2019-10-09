@@ -27,7 +27,7 @@ EXEFILE=
 GRALOBJS= tigerabs.uo tigergrm.uo tigerlex.uo tigermain.uo \
 	tigernlin.uo tigerpp.uo tigerescap.uo tigertab.uo \
 	tigerseman.uo tigertemp.uo topsort.uo tigertopsort.uo \
-	tigertrans.uo tigermuestratipos.ui
+	tigertrans.uo tigermuestratipos.ui tigermuestratipos.uo
 
 all: tiger
 
@@ -66,23 +66,23 @@ depend: tigerabs.sml tigergrm.sml tigerlex.sml tigermain.sml \
 	$(MOSMLTOOLS)/mosmldep >> Makefile
 
 ### DO NOT DELETE THIS LINE
-tigerescap.ui: tigerabs.uo 
-tigerescap.uo: tigerescap.ui tigertab.ui tigerabs.uo 
-tigergrm.ui: tigerabs.uo 
-tigergrm.uo: tigergrm.ui tigernlin.uo tigerabs.uo 
-tigerlex.uo: tigergrm.ui tigernlin.uo 
+tigertab.uo: tigertab.ui 
+tigerseman.ui: tigerabs.uo 
 tigermain.uo: tigerseman.ui tigerescap.ui tigergrm.ui tigerlex.uo \
     tigerpp.uo 
 tigermuestratipos.ui: tigertips.uo 
+tigerescap.ui: tigerabs.uo 
 tigermuestratipos.uo: tigermuestratipos.ui tigertips.uo 
-tigerpp.uo: tigerabs.uo 
-tigerseman.ui: tigerabs.uo 
 tigersres.uo: tigertab.ui tigertips.uo tigertemp.ui tigerabs.uo 
-tigertab.uo: tigertab.ui 
-tigertemp.uo: tigertemp.ui 
-tigertopsort.ui: tigertab.ui tigertips.uo tigerabs.uo 
+tigerlex.uo: tigergrm.ui tigernlin.uo 
 tigertopsort.uo: tigertopsort.ui tigertab.ui tigertips.uo tigerabs.uo \
     tigermuestratipos.ui 
+tigertemp.uo: tigertemp.ui 
+tigerpp.uo: tigerabs.uo 
+tigergrm.ui: tigerabs.uo 
+tigergrm.uo: tigergrm.ui tigernlin.uo tigerabs.uo 
+tigerescap.uo: tigerescap.ui tigertab.ui tigerabs.uo 
 tigertrans.uo: tigertrans.ui 
 tigerseman.uo: tigerseman.ui tigersres.uo tigertab.ui tigertopsort.ui \
-    tigerabs.uo tigertrans.ui 
+    tigertemp.ui tigerabs.uo tigertrans.ui 
+tigertopsort.ui: tigertab.ui tigertips.uo tigerabs.uo 
