@@ -257,8 +257,8 @@ fun transExp(venv, tenv) =
                     else error("El valor que quiere asignar no coincide con el tipo de la variable",pos))
             end
 		| trdec (venv,tenv) (FunctionDec fs) =
-			let val cleanlist = map  (fn {name, params, result, ...} => (name,params,result)) (map (#1) fs)
-				fun	funcionaux ({name,params,result,body},position) (venv) =
+			let val cleanlist = map (fn ({name, params, result, ...}, pos) => (name,params,result,pos)) fs
+				fun	funcionaux ((name,params,result,position),venv)= 
 						(case result of 
 							NONE => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = [], result = TUnit, extern = false}, venv)
 							|SOME t => (case tabBusca (t,tenv) of
@@ -266,7 +266,7 @@ fun transExp(venv, tenv) =
 												|SOME x => tabRInserta (name, Func {level=(),label = newlabel()^name,formals = [], result = x, extern = false}, venv)
 										)
 						)
-			in  (venv, tenv, [])
+			in (foldl funcionaux venv cleanlist , tenv, [])
 			end
 
 		| trdec (venv,tenv) (TypeDec ts) = let val nopos = map (#1) ts
