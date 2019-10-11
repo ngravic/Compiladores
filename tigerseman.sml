@@ -189,7 +189,7 @@ fun transExp(venv, tenv) =
 				else error("El cuerpo de un while no puede devolver un valor", nl)
 			end
 		| trexp(ForExp({var, escape, lo, hi, body}, nl)) =
-			let val newvenv = tabRInserta(var,Var{ty = TInt RO},venv)		(*Defino un nuevo entorno de trabajo que incluye el iterador declarado*)
+			let val newvenv = tabRInserta var (Var {ty = TInt RO}) venv (*Defino un nuevo entorno de trabajo que incluye el iterador declarado*)
 		    	val {exp = explo,ty = tylo } = trexp lo
 				val {exp = explhi,ty = tyhi} = trexp hi
 				val {exp = expbody,ty = tybody} = transExp(newvenv,tenv) (body) (*Tipado del body con el nuevo entorno de varables, incluye iterador*)
@@ -245,7 +245,7 @@ fun transExp(venv, tenv) =
                 in if tiposIguales (tipoinit) (TNil)
                 then error("No se puede asignar Nil a una varbiable sin especifcar su tipo",pos)
                 else
-                ((tabRInserta (name,Var {ty = tipoinit}, venv)),tenv,[])
+                (tabRInserta name (Var {ty = tipoinit}) venv, tenv,[])
                 end
 		| trdec (venv,tenv) (VarDec ({name,escape,typ=SOME s,init},pos)) =
 			let val tipoinit = (#ty (trexp(init)))
@@ -253,7 +253,7 @@ fun transExp(venv, tenv) =
             in (case tipos of
                 NONE => error("No existe el tipo que se intenta declarar",pos)
                 |SOME x =>   if tiposIguales (tipoinit)(x)
-                    then (tabRInserta(name,Var {ty=tipoinit},venv),tenv,[])
+                    then (tabRInserta name (Var {ty=tipoinit}) venv, tenv,[])
                     else error("El valor que quiere asignar no coincide con el tipo de la variable",pos))
             end
 		| trdec (venv,tenv) (FunctionDec fs) =

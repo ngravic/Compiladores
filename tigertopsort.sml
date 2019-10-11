@@ -65,23 +65,23 @@ fun procesa [] pares env _ = env: (string, Tipo) Tabla
 					| _ =>
 						case List.find((h ls op=) o #1) recs of
 						SOME (n, tr) =>
-								(tabRInserta(h, tr, env);
+								(tabRInserta h tr env;
 								SOME tr) (* OJOOOOOOOOOOOOOOOO *)
 						| _ => raise Fail (h^" **no existe!!!")
 		val env' = case ttopt of
 					SOME tt =>
 						List.foldr
-							(fn({name, ty=NameTy ty}, env') => tabRInserta(name, tt, env')
+							(fn({name, ty=NameTy ty}, env') => tabRInserta name tt env'
 							| ({name, ty=ArrayTy s}, env') =>
 								let val (k, v) =
 										case List.find((name ls op=) o #1) recs of
 										SOME x => x | _ => raise Fail "error 666+45"
-								in	tabRInserta(k, v , env') end
+								in	tabRInserta k v env' end
 							| ({name, ty=RecordTy s}, env') =>
 								let val (k, v) =
 										case List.find((name ls op=) o #1) recs of
 										SOME x => x | _ => raise Fail "error 666+46"
-								in	tabRInserta(k, v , env') end)
+								in	tabRInserta k v env' end)
 					 		env ps
 					| _ => env
 	in procesa t ps' env' recs end
@@ -99,7 +99,7 @@ fun fijaNONE [] env = env
 | fijaNONE(_::t) env = fijaNONE t env
 fun agregarecs env [] = env
 | agregarecs env ((k, v)::t) =
-	agregarecs (tabRInserta(k, v, env)) t
+	agregarecs (tabRInserta k v env) t
 
 fun fijaTipos batch env =
 	let	val pares = genPares batch

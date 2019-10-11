@@ -29,7 +29,7 @@ and travExp env d s = case s of
                                                    travExp env d e)
       | WhileExp ({test, body}, _) => (travExp env d test; travExp env d body)
       | ForExp ({var, escape, lo, hi, body}, _) =>
-                              let val env' = tabRInserta (var, (d, escape), env)
+                              let val env' = tabRInserta var (d, escape) env
                               in travExp env d  lo;
                                  travExp env d  hi;
                                  travExp env' d  body
@@ -41,14 +41,15 @@ and travExp env d s = case s of
 and travDecs env d [] = env
   | travDecs env d (s::t) = let val env' = case s of
                   FunctionDec l =>
-                          let fun aux1 (x, e) = tabRInserta
-                                                (#name x, (d+1, #escape x) ,e)
+                          let fun aux1 (x, e) = tabRInserta (#name x)
+                                                            (d+1, #escape x)
+                                                            e
                               fun aux (({params, body, ...}, _), env) =
                                   (travExp (foldr aux1 env params) (d+1) body; env)
                           in foldl aux env l end
                   | VarDec ({name, escape, init, ...}, _) => (travExp env d init;
-                                                              tabRInserta
-                                                              (name, (d, escape), env))
+                                                              tabRInserta name (d, escape) env
+                                                             )
                   | TypeDec _ => env
         in travDecs env' d t end
 
