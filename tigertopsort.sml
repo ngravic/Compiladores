@@ -60,7 +60,7 @@ fun procesa [] pares env _ = env: (string, Tipo) Tabla
 		| filt h {name, ty = ArrayTy t} = h=t
 		| filt h {name, ty = RecordTy lt} = List.exists (((NameTy h) ls op=) o #typ) lt
 		val (ps, ps') = List.partition (filt h) pares
-		val ttopt = case tabBusca(h, env) of
+		val ttopt = case tabBusca h env of
 					SOME t => SOME t
 					| _ =>
 						case List.find((h ls op=) o #1) recs of
@@ -87,7 +87,7 @@ fun procesa [] pares env _ = env: (string, Tipo) Tabla
 	in procesa t ps' env' recs end
 fun fijaNONE [] env = env
 | fijaNONE((name, TArray(ar as (ref(TTipo s)), u))::t) env =
-	(case tabBusca(s, env) of
+	(case tabBusca s env of
 	NONE => raise Fail "error interno 666+1"
 	| SOME ras => (ar := ras; fijaNONE t env))
 | fijaNONE((name, TRecord(lf, u))::t) env =

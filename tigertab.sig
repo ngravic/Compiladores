@@ -9,7 +9,7 @@ signature tigertab = sig
     val tabEsta : ''a * (''a, 'b) Tabla -> bool
     val tabInserta : ''a * 'b * (''a, 'b) Tabla -> (''a, 'b) Tabla
     val tabRInserta : ''a -> 'b -> (''a, 'b) Tabla -> (''a, 'b) Tabla
-    val tabBusca : ''a * (''a, 'b) Tabla -> 'b option
+    val tabBusca : ''a -> (''a, 'b) Tabla -> 'b option
     val tabSaca : ''a * (''a, 'b) Tabla -> 'b
     val tabAplica : ('a -> 'b) * (''c, 'a) Tabla -> (''c, 'b) Tabla
     val tabAAplica : ('a -> ''c) * ('b -> 'd) * ('a, 'b) Tabla -> (''c, 'd) Tabla
