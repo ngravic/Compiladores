@@ -80,8 +80,8 @@ fun transExp (venv, tenv) =
                    then checkError [tyl <> TUnit, tyl <> TNil orelse tyr <> TNil]
                                    TiposNoComparables "seman80" nl
                    else if inside oper [PlusOp, MinusOp, TimesOp, DivideOp]
-                        then checkError [tyl <> TInt RW] TiposNoComparables "seman83" nl
-                        else checkError [tyl <> TInt RW andalso tyl <> TString]
+                        then checkError [tyl = TInt RW] TiposNoOperables "seman83" nl
+                        else checkError [tyl = TInt RW orelse tyl = TString]
                                         TiposNoComparables "seman85" nl;
                    {exp = SCAF, ty = TInt RW} end
           | trexp (RecordExp ({fields, typ}, nl)) =
@@ -180,7 +180,7 @@ fun transExp (venv, tenv) =
                   val _= if isSome typ
                          then checkError [tiposIguales tyinit (getOptn tytyp Completar "seman181" pos)]
                                          InitIncorrecto "seman182" pos
-                         else checkError [tiposIguales tyinit TNil]
+                         else checkError [not (tiposIguales tyinit TNil)]
                                          AsignacionNil "seman184" pos
               in (tabRInserta name (Var {ty = tyinit}) venv, tenv, []) end
         | trdec (venv, tenv) (FunctionDec fs) = (venv, tenv, []) (* COMPLETAR *)
