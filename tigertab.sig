@@ -19,4 +19,5 @@ signature tigertab = sig
     val tabFiltra : ('b -> bool) * (''a, 'b) Tabla -> (''a, 'b) Tabla
     val tabPrimer : ('b -> bool) * ('a, 'b) Tabla -> ('a * 'b)
     val tabClaves : ('a, 'b) Tabla -> 'a list
+    val tabImprime : (string, 'b) Tabla -> unit
 end

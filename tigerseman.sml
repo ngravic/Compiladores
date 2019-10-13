@@ -6,18 +6,13 @@ open tigersres
 open tigertrans
 open tigertopsort
 open tigertemp
+open tigererrors
 open List
-
 
 type expty = {exp: exp, ty: Tipo}
 
 fun inside x (y::ys) = if x = y then true else inside y ys
   | inside x [] = false
-
-fun error s p = raise Fail ("Error -- línea " ^ Int.toString(p) ^ ": " ^ s ^ "\n")
-
-fun checkError bs msg nl =
-    if foldl (fn (x, y) => x andalso y) true bs then () else error msg nl
 
 fun recBusca s ((x,y,z)::xs) nv = if s = x then {exp=SCAF, ty= !y}
                                   else recBusca s xs nv
@@ -26,7 +21,7 @@ fun recBusca s ((x,y,z)::xs) nv = if s = x then {exp=SCAF, ty= !y}
 type venv = (string, EnvEntry) tigertab.Tabla
 type tenv = (string, Tipo) tigertab.Tabla
 
-val tab_tipos : (string, Tipo) Tabla = tabInserList( tabNueva(),
+val tab_tipos : (string, Tipo) Tabla = tabInserList (tabNueva (),
                                        [("int", TInt RW), ("string", TString)])
 
 val tab_vars : (string, EnvEntry) Tabla = tabInserList( tabNueva(),
@@ -70,7 +65,7 @@ fun transExp (venv, tenv) =
                                                     andalso argsIguales xs ys
                     | argsIguales [] [] = true
                     | argsIguales _ _ = error "No coinciden la cantidad de argumentos" nl
-              in case getOpt (tabBusca func venv, error (func ^ " no fue declarada ") nl) of
+              in case getOptn (tabBusca func venv) (func ^ " no fue declarada") nl of
                       Func ({formals, result, ...}) =>
                                 if argsIguales formals (map (#ty o trexp) args)
                                 then {exp = SCAF, ty= result}
@@ -93,8 +88,8 @@ fun transExp (venv, tenv) =
                   (* Traducir cada expresión de fields *)
                   val tfields = map (fn (sy, ex) => (sy, trexp ex)) fields
                   (* Buscar el tipo *)
-                  val (tyr, cs) = case getOpt (tabBusca typ tenv,
-                                               error ("Tipo inexistente (" ^ typ ^ ")") nl) of
+                  val (tyr, cs) = case getOptn (tabBusca typ tenv)
+                                               ("Tipo inexistente (" ^ typ ^ ")") nl of
                                   TRecord (cs, u) => (TRecord (cs, u), cs)
                                 | _ => error (typ ^ " no es de tipo record") nl
                   (* Verificar que cada campo esté en orden y tenga una expresión del tipo que corresponde *)
@@ -109,8 +104,8 @@ fun transExp (venv, tenv) =
               in {exp = SCAF, ty = tyr} end
           | trexp (SeqExp (s, nl)) = {exp = SCAF, ty = #ty (hd (rev (map trexp s)))}
           | trexp (AssignExp ({var = SimpleVar s, exp}, nl)) =
-                (case getOpt (tabBusca s tenv,
-                              error ("La variable" ^ s ^ " no fue declarada") nl) of
+                (case getOptn (tabBusca s tenv)
+                              ("La variable" ^ s ^ " no fue declarada") nl of
                      TInt RO => error "Intento de asignacion a variable RO" nl
                    | t => checkError [tiposIguales t (#ty (trexp exp))]
                                      "Error de tipado en asignacion de variable" nl;
@@ -159,14 +154,14 @@ fun transExp (venv, tenv) =
           | trexp (BreakExp nl) = {exp = SCAF, ty = TUnit}
           | trexp (ArrayExp ({typ, size, init}, nl)) =
               let val {exp = sizexp, ty = tysize} = trexp size
-                  val tytyp = getOpt (tabBusca typ tenv,
-                                      error "El tipo que define el arreglo no fue declarado" nl)
+                  val tytyp = getOptn (tabBusca typ tenv)
+                                      "El tipo que define el arreglo no fue declarado" nl
                   val {exp = initxp, ty = tyinit} = trexp init
               in checkError [tiposIguales tysize (TInt RO)] "El declarador de tamaño de arreglo no es Entero" nl;
                  checkError [tiposIguales tytyp tyinit] "El tipo del valor inicial no coincide con el del arreglo" nl;
                  {exp = SCAF, ty = TUnit} end
         and trvar (SimpleVar s, nl) =
-                (case getOpt (tabBusca s venv, error "Variable Simple no declarada" nl) of
+                (case getOptn (tabBusca s venv) "Variable Simple no declarada" nl of
                       (Var x) => {exp = SCAF, ty = #ty x}
                     | _ => error "No se trata de una variable sino de una función" nl)
           | trvar (FieldVar(v, s), nl) =
@@ -183,7 +178,7 @@ fun transExp (venv, tenv) =
               let val tyinit = #ty (trexp init)
                   val tytyp = tabBusca (getOpt (typ, "")) tenv
                   val _= if isSome typ
-                         then checkError [tiposIguales tyinit (getOpt (tytyp, error "No existe el tipo que se intenta declarar" pos))]
+                         then checkError [tiposIguales tyinit (getOptn tytyp "No existe el tipo que se intenta declarar" pos)]
                                          "El valor que quiere asignar no coincide con el tipo de la variable" pos
                          else checkError [tiposIguales tyinit TNil]
                                          "No se puede asignar Nil a una variable sin especificar su tipo" pos
@@ -197,7 +192,7 @@ fun transProg ex =
                 LetExp ({decs = [FunctionDec [({name="_tigermain", params = [],
                                  result = NONE, body = ex}, 0)]],
                          body = UnitExp 0}, 0)
-        (*val _ = transExp(tab_vars, tab_tipos) main*)
+        (*val _ = transExp (tab_vars, tab_tipos) main*)
         val _ = transExp (tab_vars, tab_tipos) ex
     in print "bien!\n" end
 end

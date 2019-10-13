@@ -1,12 +1,13 @@
 structure tigermuestratipos:> tigermuestratipos = struct
 
 open tigertips
+open tigererrors
 
 fun buscaRecordArray unique lenv =
     let fun aux (_, TArray (_, u)) = u = unique
           | aux (_, TRecord (_, u)) = u = unique
           | aux _ = false
-        val (k, _) = getOpt (List.find aux lenv, raise Fail "error interno76543")
+        val (k, _) = getOptn (List.find aux lenv) "error interno76543" ~1
     in k end
 
 fun printTipo n t lenv = let

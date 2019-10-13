@@ -2,13 +2,14 @@ structure tigerescap :> tigerescap = struct
 
 open tigerabs
 open tigertab
+open tigererrors
 
 type depth = int
 type escEnv = (string, depth * bool ref) tigertab.Tabla
 
 fun travVar env d s = case s of
-        SimpleVar s => let val (dd, b) = getOpt (tabBusca s env,
-                                         raise Fail ("escape?? "^s^" inexist."))
+        SimpleVar s => let val (dd, b) = getOptn (tabBusca s env)
+                                                 ("escape?? "^s^" inexist.") ~1
                        in if d > dd then b := true else () end
         | FieldVar (v, s) => travVar env d v
         | SubscriptVar (v, e) => (travVar env d v; travExp env d e)
