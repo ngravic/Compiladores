@@ -9,7 +9,7 @@ type escEnv = (string, depth * bool ref) tigertab.Tabla
 
 fun travVar env d s = case s of
         SimpleVar s => let val (dd, b) = getOptn (tabBusca s env)
-                                                 ("escape?? "^s^" inexist.") ~1
+                                                 (Escape s) "escap12" ~1
                        in if d > dd then b := true else () end
         | FieldVar (v, s) => travVar env d v
         | SubscriptVar (v, e) => (travVar env d v; travExp env d e)
