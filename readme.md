@@ -1,12 +1,12 @@
 # Compilador de Tiger (2019-)
 
-### tigerseman.sml
+## tigerseman.sml
 - [ ] Completar trdec FunctionDec
 - [ ] Completar trdec TypeDec
 
-### Casos de prueba
+## Casos de prueba
 
-#### good
+### good
 - [ ] compare-record-and-nil
 - [ ] fact
 - [x] local-vs-global-type
@@ -31,12 +31,29 @@
 - [x] test50
 - [ ] three-name-spaces
 
-#### syntax
+### syntax
 - [x] typeid
 
-#### type
+### type
 - [x] assign-loop-var
 
-##### Damian Ariel Marotte
-##### Esteban Ariel Diale
-##### Nicolas Matias Gravich
+### wrong
+- [x] cantidadargumentos
+- [x] condicionincorrecta
+- [x] cuerpoincorrecto
+- [x] extremosincorrectos
+- [x] fnodeclarada
+- [x] ifdiferentes
+- [x] nofuncion
+- [x] norecord
+- [x] operandosdistintos
+- [x] tipoinexistente
+- [x] tiposargumento
+- [x] tiposnocomparables1
+- [x] tiposnocomparables2
+- [x] tiposnocomparables3
+- [x] tiposnooperables
+
+###### Damian Ariel Marotte
+###### Esteban Ariel Diale
+###### Nicolas Matias Gravich
