@@ -17,7 +17,7 @@ fun name x = x
 
 fun tabEsta (s, t) = isSome (peek t s)
 
-fun tabInserta (s, e, t) = let val t' = copy t in (peekInsert t' (s, e); t') end
+fun tabInserta s e t = let val t' = copy t in (peekInsert t' (s, e); t') end
 
 fun tabRInserta s e t = let val t' = copy t in (insert t' (s, e); t') end
 

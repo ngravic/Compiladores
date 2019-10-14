@@ -2,7 +2,8 @@
 
 ## tigerseman.sml
 - [ ] Completar trdec FunctionDec
-- [ ] Completar trdec TypeDec
+- [x] Completar trdec TypeDec
+- [ ] Corregir trdec
 
 ## Casos de prueba
 
@@ -20,7 +21,7 @@
 - [ ] test06
 - [ ] test07
 - [x] test08
-- [ ] test12
+- [x] test12
 - [ ] test27
 - [ ] test30
 - [x] test37
@@ -36,6 +37,39 @@
 
 ### type
 - [x] assign-loop-var
+- [x] fun-vs-var
+- [x] nil-equal-nil
+- [x] test09 (ifdiferentes)
+- [x] test10 (cuerpoincorrecto)
+- [x] test11 (extremosincorrectos)
+- [x] test13 (operandosdistintos)
+- [ ] test14
+- [x] test15
+- [x] test16
+- [ ] test17
+- [ ] test18
+- [x] test19
+- [x] test20
+- [ ] test21
+- [ ] test22
+- [ ] test23
+- [x] test24
+- [x] test25
+- [x] test26
+- [ ] test28
+- [ ] test29
+- [x] test31
+- [ ] test32
+- [x] test33
+- [ ] test34
+- [ ] test35
+- [ ] test36
+- [ ] test38
+- [ ] test39
+- [ ] test40
+- [x] test43
+- [x] test45
+- [ ] test51
 
 ### wrong
 - [x] cantidadargumentos

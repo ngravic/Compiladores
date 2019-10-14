@@ -13,26 +13,27 @@ fun buscaRecordArray unique lenv =
 fun printTipo n t lenv = let
     fun prnt TUnit = "TUnit\n"
       | prnt TNil = "TNil\n"
-      | prnt (TInt _) = "TInt\n"
+      | prnt (TInt RO) = "TInt RO\n"
+      | prnt (TInt RW) = "TInt RW\n"
       | prnt TString = "TString\n"
       | prnt (TArray (ref t, _)) = "TArray of " ^ prnt t
       | prnt (TTipo s) = "TTipo " ^ s
       | prnt (TRecord (l, u)) =
                 let fun aux [] = ""
-                      | aux ((_, ref (TTipo tr), ir)::_) = "TRecord(TTipo " ^
+                      | aux ((_, ref (TTipo tr), ir)::_) = "TRecord (TTipo " ^
                                                            tr ^ " " ^
                                                            Int.toString (ir) ^
                                                            ")\n"
-                      | aux ((_, ref (TRecord(_, u)), ir)::t) = (buscaRecordArray u lenv) ^
-                                                                " " ^ Int.toString ir
-                                                                ^ " " ^ aux t
-                      | aux ((_, ref (TArray(_, u)), ir)::t) = (buscaRecordArray u lenv) ^
-                                                               " " ^ Int.toString ir ^
-                                                               " " ^ aux t
+                      | aux ((_, ref (TRecord (_, u)), ir)::t) = (buscaRecordArray u lenv) ^
+                                                                 " " ^ Int.toString ir
+                                                                 ^ " " ^ aux t
+                      | aux ((_, ref (TArray (_, u)), ir)::t) = (buscaRecordArray u lenv) ^
+                                                                " " ^ Int.toString ir ^
+                                                                " " ^ aux t
                       | aux ((_, ref tr, ir)::t) = prnt tr ^  " " ^
                                                    Int.toString ir ^ " " ^ aux t
-                in "TRecord[" ^ (aux l) ^ "]\n" end
-    in print (n ^ " = " ^ prnt t) end
+                in "TRecord [\n" ^ (aux l) ^ "]\n" end
+    in print (n ^ " = " ^ prnt t ^ "\n") end
 
 fun printTTipos tips = List.app (fn (s, t) => printTipo s t tips) tips
 
