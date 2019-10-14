@@ -80,7 +80,7 @@ tigertrans.uo: tigertrans.ui
 tigermuestratipos.uo: tigermuestratipos.ui tigertips.uo tigererrors.uo 
 tigerlex.uo: tigergrm.ui tigernlin.uo 
 tigertopsort.uo: tigertopsort.ui tigertab.ui tigertips.uo tigerabs.uo \
-    tigermuestratipos.ui 
+    tigermuestratipos.ui tigererrors.uo 
 tigerescap.uo: tigerescap.ui tigertab.ui tigerabs.uo tigererrors.uo 
 tigermain.uo: tigerseman.ui tigerescap.ui tigergrm.ui tigerlex.uo \
     tigerpp.uo 
