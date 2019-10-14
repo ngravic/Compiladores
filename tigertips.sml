@@ -5,7 +5,7 @@ structure tigertips = struct
 
     datatype Tipo = TUnit
                   | TNil
-                  | TInt of TIntRW 
+                  | TInt of TIntRW
                   | TString
                   | TArray of Tipo ref  * unique
                   | TRecord of (string * Tipo ref * int) list * unique

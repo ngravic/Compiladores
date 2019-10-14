@@ -27,6 +27,7 @@ datatype Error = Escape of string
                | AsignacionNil
                | ErrorInterno
                | NoExiste of string
+               | NoVariable
 
 fun mensaje c = case c of
                 Escape e => "Escape " ^ e ^ " inexistente."
@@ -56,6 +57,7 @@ fun mensaje c = case c of
               | AsignacionNil => "No se puede asignar Nil a una variable sin especificar el tipo."
               | ErrorInterno => "Error interno."
               | NoExiste h => h ^ " **no existe!!!"
+              | NoVariable => "No se puede asignar nada a una funcion."
 
 fun error e c nl = raise Fail ("\nError en linea " ^ (Int.toString nl) ^
                                ": " ^ (mensaje e) ^ "\nCodigo de error: " ^ c)

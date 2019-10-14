@@ -104,10 +104,11 @@ fun transExp (venv, tenv) =
               in {exp = SCAF, ty = tyr} end
           | trexp (SeqExp (s, nl)) = {exp = SCAF, ty = #ty (hd (rev (map trexp s)))}
           | trexp (AssignExp ({var = SimpleVar s, exp}, nl)) =
-                (case getOptn (tabBusca s tenv)
+                (case getOptn (tabBusca s venv)
                               (VNoDeclarada s) "seman108" nl of
-                     TInt RO => error SoloLectura "seman109" nl
-                   | t => checkError [tiposIguales t (#ty (trexp exp))]
+                     Var {ty = TInt RO} => error SoloLectura "seman109" nl
+                   | Func _ => error NoVariable "seman110" nl
+                   | _ => checkError [tiposIguales (TInt RW) (#ty (trexp exp))]
                                      AsignacionIncorrecta "seman111" nl;
                           {exp = SCAF, ty = TUnit})
           | trexp (AssignExp ({var = (fv as FieldVar (v, s)), exp}, nl)) =
@@ -140,7 +141,7 @@ fun transExp (venv, tenv) =
                  {exp = SCAF, ty = TUnit} end
           | trexp (ForExp ({var, escape, lo, hi, body}, nl)) =
               let val newvenv = tabRInserta var (Var {ty = TInt RO}) venv (*Defino un nuevo entorno de trabajo que incluye el iterador declarado*)
-                  val {exp = explo,ty = tylo} = trexp lo
+                  val {exp = explo, ty = tylo} = trexp lo
                   val {exp = explhi, ty = tyhi} = trexp hi
                   val {exp = expbody, ty = tybody} = transExp (newvenv, tenv) body (*Tipado del body con el nuevo entorno de varables, incluye iterador*)
               in checkError [tiposIguales tylo (TInt RW), tiposIguales tyhi tylo]
