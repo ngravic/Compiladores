@@ -183,18 +183,20 @@ fun transExp (venv, tenv) =
                             | _ => error NoArray "seman177" nl) end
       and trdec (venv, tenv) (VarDec ({name, escape, typ, init}, pos)) =
               let val tyinit = #ty (transExp (venv, tenv) init)
-                  val tytyp = getOpt ((tabBusca (getOpt (typ, "")) tenv), TNil) (* VERIFICAR TNIL *)
-                  (* val _ = (print "TINIT: "; (printIType tyinit); print "\n";
-                          print "TYTIP: "; (printIType tytyp); print "\n") *)
+                  val tytyp = getOpt ((tabBusca (getOpt (typ, "")) tenv), TUnit) (* VERIFICAR TUNIT *)
+                  val _ = (print ("NOMBRE: " ^ name ^ "\n");
+                           print "TINIT: "; (printIType tyinit); print "\n";
+                           print "TYTIP: "; (printIType tytyp); print "\n")
                   val _ = if isSome typ
                           then checkError [tiposIguales tyinit tytyp]
                                           InitIncorrecto "seman183" pos
-                          else checkError [not (tiposIguales tyinit TNil)]
+                          else checkError [not (tyinit = TNil)]
                                           AsignacionNil "seman185" pos
               in (tabRInserta name (Var {ty = tyinit}) venv, tenv, []) end
         | trdec (venv, tenv) (FunctionDec fs) = (venv, tenv, []) (* COMPLETAR *)
         | trdec (venv, tenv) (TypeDec ts) = (venv, fijaTipos (map #1 ts) tenv, [])
                                             handle Ciclo => error TipoCiclico "seman189" ~1
+                                              | noExiste => error CicloInterrumpido "seman199" ~1
     in trexp end
 
 fun transProg ex =

@@ -15,15 +15,15 @@
 - [ ] queens
 - [x] recursive-comments
 - [x] recursive-types
-- [ ] test01
-- [ ] test02
+- [x] test01
+- [x] test02
 - [x] test03
 - [ ] test06
 - [ ] test07
 - [x] test08
 - [x] test12
 - [ ] test27
-- [ ] test30
+- [x] test30
 - [x] test37
 - [ ] test42
 - [ ] test44
@@ -37,16 +37,16 @@
 
 ### type
 - [x] assign-loop-var
-- [x] fun-vs-var
+- [ ] fun-vs-var
 - [x] nil-equal-nil
 - [x] test09 (ifdiferentes)
 - [x] test10 (cuerpoincorrecto)
 - [x] test11 (extremosincorrectos)
 - [x] test13 (operandosdistintos)
-- [ ] test14
+- [x] test14
 - [x] test15
 - [x] test16
-- [ ] test17
+- [x] test17
 - [ ] test18
 - [x] test19
 - [x] test20

@@ -30,6 +30,7 @@ datatype Error = Escape of string
                | NoVariable
                | TipoCiclico
                | NoArray
+               | CicloInterrumpido
 
 fun mensaje c = case c of
                 Escape e => "Escape " ^ e ^ " inexistente."
@@ -60,8 +61,9 @@ fun mensaje c = case c of
               | ErrorInterno => "Error interno."
               | NoExiste h => h ^ " **no existe!!!"
               | NoVariable => "No se puede asignar nada a una funcion."
-              | TipoCiclico => "Declaracion de tipos mutuamente recursivos"
-              | NoArray => "La variable no es un array"
+              | TipoCiclico => "Declaracion de tipos mutuamente recursivos."
+              | NoArray => "La variable no es un array."
+              | CicloInterrumpido => "Batch de declaracion interrumpido"
 
 fun error e c nl = raise Fail ("\nError en linea " ^ (Int.toString nl) ^
                                ": " ^ (mensaje e) ^ "\nCodigo de error: " ^ c)
