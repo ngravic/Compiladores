@@ -51,15 +51,15 @@
 - [x] test19
 - [x] test20
 - [ ] test21
-- [ ] test22
-- [ ] test23
+- [x] test22
+- [x] test23
 - [x] test24
 - [x] test25
 - [x] test26
-- [ ] test28
-- [ ] test29
+- [x] test28
+- [x] test29
 - [x] test31
-- [ ] test32
+- [x] test32
 - [x] test33
 - [ ] test34
 - [ ] test35

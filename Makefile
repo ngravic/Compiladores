@@ -67,7 +67,6 @@ depend: tigerabs.sml tigergrm.sml tigerlex.sml tigermain.sml \
 
 ### DO NOT DELETE THIS LINE
 tigerescap.ui: tigerabs.uo 
-tigerescap.uo: tigerescap.ui tigertab.ui tigerabs.uo tigererrors.uo 
 tigermain.uo: tigerseman.ui tigerescap.ui tigergrm.ui tigerlex.uo \
     tigerpp.uo 
 tigermuestratipos.ui: tigertips.uo 
@@ -80,7 +79,8 @@ tigertemp.uo: tigertemp.ui
 tigertopsort.ui: tigertab.ui tigertips.uo tigerabs.uo 
 tigertrans.uo: tigertrans.ui 
 tigertopsort.uo: tigertopsort.ui tigertab.ui tigertips.uo tigerabs.uo \
-    tigermuestratipos.ui tigererrors.uo 
+    tigererrors.uo 
+tigerescap.uo: tigerescap.ui tigertab.ui tigerabs.uo tigererrors.uo 
 tigerseman.uo: tigerseman.ui tigersres.uo tigertab.ui tigertopsort.ui \
     tigertemp.ui tigerabs.uo tigererrors.uo tigertrans.ui 
 tigergrm.uo: tigergrm.ui tigernlin.uo tigerabs.uo 

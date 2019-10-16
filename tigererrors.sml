@@ -31,6 +31,7 @@ datatype Error = Escape of string
                | TipoCiclico
                | NoArray
                | CicloInterrumpido
+               | CampoInexistente
 
 fun mensaje c = case c of
                 Escape e => "Escape " ^ e ^ " inexistente."
@@ -56,7 +57,7 @@ fun mensaje c = case c of
               | ExtremosIncorrectos => "Los tipos de los extremos deben ser int."
               | TNoDeclarado t => "El tipo " ^ t ^ " no fue declarado."
               | TamanoIncorrecto => "El tipo del tamaño debe ser int."
-              | InitIncorrecto => "No coincide el tipo del valor inicial con el del arreglo."
+              | InitIncorrecto => "No coincide el tipo del valor inicial con el de la estructura."
               | AsignacionNil => "No se puede asignar Nil a una variable sin especificar el tipo."
               | ErrorInterno => "Error interno."
               | NoExiste h => h ^ " **no existe!!!"
@@ -64,6 +65,7 @@ fun mensaje c = case c of
               | TipoCiclico => "Declaracion de tipos mutuamente recursivos."
               | NoArray => "La variable no es un array."
               | CicloInterrumpido => "Batch de declaracion interrumpido"
+              | CampoInexistente => "No existe ese campo en el registro."
 
 fun error e c nl = raise Fail ("\nError en linea " ^ (Int.toString nl) ^
                                ": " ^ (mensaje e) ^ "\nCodigo de error: " ^ c)

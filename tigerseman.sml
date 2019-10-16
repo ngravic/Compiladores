@@ -170,7 +170,7 @@ fun transExp (venv, tenv) =
           | trvar (FieldVar (v, s), nl) =
                 let fun recBusca s ((x,y,z)::xs) nv = if s = x then {exp=SCAF, ty= !y}
                                                                else recBusca s xs nv
-                      | recBusca s [] nv = error Completar "seman168" nv
+                      | recBusca s [] nv = error CampoInexistente "seman168" nv
                 in (case #ty (trvar (v, nl)) of
                     TRecord (tv, _) => recBusca s tv nl
                     | _ => error (NoRecord "") "seman171" nl)
