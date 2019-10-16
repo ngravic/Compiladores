@@ -16,6 +16,6 @@ structure tigertips = struct
       | printIType TInt             = print "TInt"
       | printIType TString          = print "TString"
       | printIType TArray (t, _)    = print "TArray "; printIType t 
-      | printIType TRecord (lst, _) = map (fn x: (_, t, _) => printIType t) lst
+      | printIType TRecord (lst, _) = print "TRecord"; map (fn x: (_, t, _) => printIType t) lst
       | printIType TTipo t          = print t
 end
