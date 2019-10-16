@@ -1,0 +1,6 @@
+let
+    var N := 8
+    var M := N
+in
+    N
+end

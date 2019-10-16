@@ -3,7 +3,7 @@
 ## tigerseman.sml
 - [ ] Completar trdec FunctionDec
 - [x] Completar trdec TypeDec
-- [ ] Corregir trdec
+- [x] Corregir trdec
 
 ## Casos de prueba
 
@@ -14,10 +14,10 @@
 - [ ] merge
 - [ ] queens
 - [x] recursive-comments
-- [ ] recursive-types
+- [x] recursive-types
 - [ ] test01
 - [ ] test02
-- [ ] test03
+- [x] test03
 - [ ] test06
 - [ ] test07
 - [x] test08
@@ -64,12 +64,12 @@
 - [ ] test34
 - [ ] test35
 - [ ] test36
-- [ ] test38
-- [ ] test39
+- [x] test38
+- [x] test39
 - [ ] test40
 - [x] test43
 - [x] test45
-- [ ] test51
+- [x] test51
 
 ### wrong
 - [x] cantidadargumentos

@@ -154,9 +154,11 @@ fun transExp (venv, tenv) =
           | trexp (ArrayExp ({typ, size, init}, nl)) =
               let val {exp = sizexp, ty = tysize} = trexp size
                   val tytyp = getOptn (tabBusca typ tenv) (TNoDeclarado typ) "seman156" nl
+                  val tyarr = (case tytyp of (TArray (x,_)) => !x
+                                           | _ => error NoArray "seman159'" nl)
                   val {exp = initxp, ty = tyinit} = trexp init
               in checkError [tiposIguales tysize (TInt RO)] TamanoIncorrecto "seman158" nl;
-                 checkError [tiposIguales tytyp tyinit] InitIncorrecto "seman159" nl;
+                 checkError [tiposIguales tyarr tyinit] InitIncorrecto "seman159" nl;
                  {exp = SCAF, ty = TUnit} end
         and trvar (SimpleVar s, nl) =
                 (case getOptn (tabBusca s venv) (VNoDeclarada s) "seman162" nl of
@@ -177,7 +179,7 @@ fun transExp (venv, tenv) =
                  (case tyv of TArray (t, _) => {exp = SCAF, ty = !t}
                             | _ => error NoArray "seman177" nl) end
       and trdec (venv, tenv) (VarDec ({name, escape, typ, init}, pos)) =
-              let val tyinit = #ty (trexp init)
+              let val tyinit = #ty (transExp (venv, tenv) init)
                   val tytyp = tabBusca (getOpt (typ, "")) tenv
                   val _ = if isSome typ
                           then checkError [tiposIguales tyinit (getOptn tytyp Completar "seman181" pos)]
