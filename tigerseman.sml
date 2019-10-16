@@ -14,12 +14,14 @@ type expty = {exp: exp, ty: Tipo}
 fun inside x (y::ys) = if x = y then true else inside y ys
   | inside x [] = false
 
-
 type venv = (string, EnvEntry) tigertab.Tabla
 type tenv = (string, Tipo) tigertab.Tabla
 
 val tab_tipos : (string, Tipo) Tabla = tabInserList (tabNueva (),
                                        [("int", TInt RW), ("string", TString)])
+
+fun rectype (TArray (t, _)) = rectype (!t)
+  | rectype t = t
 
 val tab_vars : (string, EnvEntry) Tabla = tabInserList(tabNueva (),
     [("print", Func {level = mainLevel, label = "print",
@@ -154,12 +156,13 @@ fun transExp (venv, tenv) =
           | trexp (ArrayExp ({typ, size, init}, nl)) =
               let val {exp = sizexp, ty = tysize} = trexp size
                   val tytyp = getOptn (tabBusca typ tenv) (TNoDeclarado typ) "seman156" nl
-                  val tyarr = (case tytyp of (TArray (x,_)) => !x
+                  val tyarr = (case tytyp of (TArray (t,_)) => (!t)
                                            | _ => error NoArray "seman159'" nl)
                   val {exp = initxp, ty = tyinit} = trexp init
+                  val _ = (print "TYARR: "; printIType tyarr; print "\nTYINIT: "; printIType tyinit; print "\n")
               in checkError [tiposIguales tysize (TInt RO)] TamanoIncorrecto "seman158" nl;
                  checkError [tiposIguales tyarr tyinit] InitIncorrecto "seman159" nl;
-                 {exp = SCAF, ty = TUnit} end
+                 {exp = SCAF, ty = tytyp} end
         and trvar (SimpleVar s, nl) =
                 (case getOptn (tabBusca s venv) (VNoDeclarada s) "seman162" nl of
                       (Var x) => {exp = SCAF, ty = #ty x}
@@ -180,9 +183,11 @@ fun transExp (venv, tenv) =
                             | _ => error NoArray "seman177" nl) end
       and trdec (venv, tenv) (VarDec ({name, escape, typ, init}, pos)) =
               let val tyinit = #ty (transExp (venv, tenv) init)
-                  val tytyp = tabBusca (getOpt (typ, "")) tenv
+                  val tytyp = getOpt ((tabBusca (getOpt (typ, "")) tenv), TNil) (* VERIFICAR TNIL *)
+                  (* val _ = (print "TINIT: "; (printIType tyinit); print "\n";
+                          print "TYTIP: "; (printIType tytyp); print "\n") *)
                   val _ = if isSome typ
-                          then checkError [tiposIguales tyinit (getOptn tytyp Completar "seman181" pos)]
+                          then checkError [tiposIguales tyinit tytyp]
                                           InitIncorrecto "seman183" pos
                           else checkError [not (tiposIguales tyinit TNil)]
                                           AsignacionNil "seman185" pos
