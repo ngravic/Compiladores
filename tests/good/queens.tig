@@ -1,4 +1,4 @@
-/* A program to solve the 8-queens problem */
+/* REQUERIMENTS OK */
 
 let
     var N := 8

@@ -30,5 +30,6 @@ error_list = {
     "TipoCiclico" : ["Declaracion de tipos mutuamente recursivos."],
     "NoArray" : ["La variable no es un array."],
     "CicloInterrumpido" : ["Batch de declaracion interrumpido"],
-    "CampoInexistente" : ["No existe ese campo en el registro."]
+    "CampoInexistente" : ["No existe ese campo en el registro."],
+    "OK" : ["bien!"]
 }

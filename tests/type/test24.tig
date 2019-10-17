@@ -1,3 +1,4 @@
+/* REQUERIMENTS NoArray */
 /* error : variable not array */
 let 
 	var d :=0

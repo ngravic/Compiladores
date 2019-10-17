@@ -1,4 +1,4 @@
-/* an array type and an array variable */
+/* REQUERIMENTS OK */
 let
   type  arrtype = array of int
   type matrix = array of arrtype

@@ -1,3 +1,4 @@
+/* REQUERIMENTS OperandosDistintos */
 /* error: initialize with unit and causing type mismatch in addition */
 
 let

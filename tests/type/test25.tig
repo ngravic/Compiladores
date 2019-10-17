@@ -1,3 +1,4 @@
+/* REQUERIMENTS NoRecord */
 /* error : variable not record */
 let 
 	var d :=0

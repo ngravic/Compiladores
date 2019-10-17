@@ -1,4 +1,4 @@
-/* define valid mutually recursive procedures */
+/* REQUERIMENTS OK */
 let
 
 function do_nothing1 (a : int, b : string)=

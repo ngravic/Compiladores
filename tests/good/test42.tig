@@ -1,3 +1,4 @@
+/* REQUERIMENTS OK */
 /* correct declarations */
 let
   type arrtype1 = array of int

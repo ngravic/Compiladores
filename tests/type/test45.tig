@@ -1,3 +1,4 @@
+/* REQUERIMENTS AsignacionNil */
 /* error : initializing nil expressions not constrained by record type */
 let 
 	type rectype = {name : string, id : int}

@@ -1,4 +1,5 @@
-/* a record type and a record variable */
+/* REQUERIMENTS OK */
+
 let
   type  rectype = {name : string, age : int}
   var rec1 : rectype := rectype {name="Nobody", age=1000}

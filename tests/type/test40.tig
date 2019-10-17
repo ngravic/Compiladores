@@ -1,3 +1,5 @@
+/* REQUERIMENTS COMPLETAR */
+/* Ver que le corresponde
 /* error : procedure returns value */
 let
 	function g (a : int) = a

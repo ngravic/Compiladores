@@ -1,4 +1,4 @@
-/* local types hide global */
+/* REQUERIMENTS OK */
 let
 	type a = int
 in

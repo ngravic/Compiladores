@@ -1,3 +1,5 @@
+/* REQUERIMENTS Completar */
+/* Lo mismo que test36 */
 /* error : formals are more then actuals */
 let
 	function g (a : int , b : string) : int = a

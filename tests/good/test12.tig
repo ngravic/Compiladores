@@ -1,4 +1,5 @@
-/* valid for and let */
+/* REQUERIMENTS OK *//* valid for and let */
+
 
 let
 	var a := 0
