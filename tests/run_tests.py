@@ -47,7 +47,7 @@ class TestEtapa1():
                 f.write("- [x] " + os.path.relpath(fi) + "\n")
             f.write("\n\n##No Pasaron:\n\n")
             for fi in fails:
-                f.write("- [ ] " + os.path.relpath(fi) + "\n")
+                f.write("- [ ] " + os.path.relpath(fi['file']) + "\n")
 
     def runAll(self):
         ok    = set()
