@@ -10,7 +10,7 @@ def getAllTigerFiles(folder):
         return files
 
 def runTest(file):
-    TIGER_PATH = "../tiger/"
+    TIGER_PATH = os.path.abspath(os.path.join(os.path.abspath('.'), '..', 'tiger'))
     p = subprocess.Popen([TIGER_PATH, file], stdout=subprocess.PIPE, shell=True)
     (out, err) = p.communicate()
     p.wait()
