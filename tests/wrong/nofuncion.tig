@@ -1,3 +1,4 @@
+/* REQUERIMENTS NoFuncion */
 let var f := 5
 in f("")
 end
