@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 from utils import getAllTigerFiles, runTest
 from error_list import error_list
