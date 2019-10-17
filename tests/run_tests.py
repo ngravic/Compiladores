@@ -13,13 +13,13 @@ class TestEtapa1():
             if REQUERIMENTS_KW in line:
                 idx = line.index(REQUERIMENTS_KW) + len(REQUERIMENTS_KW)
                 req = line[idx:]
-                return map(lambda x: x.strip(), req.split(' '))
+                return filter(None, map(lambda x: x.strip(), req.split(' ')))
             return []
 
     def checkRequeriment(self, requeriment, output):
         if requeriment not in error_list:
-            raise Exception("El requerimiento '%s' no esta en la lista " +
-                "de errores. Agregar a error_list" % requeriment)
+            raise Exception(("El requerimiento '%s' no esta en la lista " + 
+                "de errores. Agregar a error_list") % requeriment)
         for text_req in error_list[requeriment]:
             if text_req not in output:
                 return False
