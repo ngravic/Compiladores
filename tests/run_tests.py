@@ -41,13 +41,15 @@ class TestEtapa1():
 
     def printMarkDown(self, files_ok, fails):
         with open(self.md, 'w+') as f:
-            f.write("##Casos de prueba\n\n")
-            f.write("###Pasaron:\n\n")
+            f.write("## Casos de prueba\n\n")
+            f.write("### Pasaron:\n\n")
             for fi in files_ok:                
-                f.write("- [x] " + os.path.relpath(fi) + "\n")
-            f.write("\n\n##No Pasaron:\n\n")
+                f.write("- [x] [%s](%s)\n" % \
+                    (os.path.relpath(fi), os.path.relpath(fi)))
+            f.write("\n\n## No Pasaron:\n\n")
             for fi in fails:
-                f.write("- [ ] " + os.path.relpath(fi['file']) + "\n")
+                f.write("- [ ] [%s](%s)\n" % \
+                    (os.path.relpath(fi['file']), os.path.relpath(fi['file'])))
 
     def runAll(self):
         ok    = set()
