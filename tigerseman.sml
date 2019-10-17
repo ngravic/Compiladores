@@ -194,7 +194,20 @@ fun transExp (venv, tenv) =
                  else (checkError [not (tyinit = TNil)] AsignacionNil "seman185" pos;
                                   ((tabRInserta name (Var {ty = tyinit}) venv), tenv, []))
               end
-        | trdec (venv, tenv) (FunctionDec fs) = (venv, tenv, []) (*
+        | trdec (venv, tenv) (FunctionDec fs) = 
+            let 
+                fun aux ({name, params : field list, result, body}, pos)=
+                    let
+                        val typlist = map #name params
+                        fun tabBuscaF x y = tabBusca y x
+                        val tysearched = map (tabBuscaF tenv) typlist
+                        fun getOptnF e c nl opt = getOptn opt e c nl
+                        val tyfound = map (getOptnF Completar "seman205" pos) tysearched
+                        (*val tablenetry = Func {level: (), label: tigertemp.newlabel()^name^pos, formals  }*)
+                        in () end
+                    
+            in (venv, tenv, []) 
+            end (*
         
         			(*fs tiene la sigueinte estructura:
 				Lista de:
@@ -223,7 +236,7 @@ fun transExp (venv, tenv) =
 							 -De la lista obtenida en el paso anterior, buscar todos los elementos en el
 							  entorno de tipos (usar tabBusca)
 							  Si alguno no se encuentra lanzar una excepción, si no, conservar esta lista (typ list)
-					 5)Obtener el ripo de retorno de la función. (obtención de un campo de un record)
+					 5)Obtener el tipo de retorno de la función. (obtención de un campo de un record)
 				 Con lo obtenido en (3), (4) y (5) construir una entrada de la tabla de entorno de variables, es decir
 				 (string, EnvEntry)
 				 Tiene la siguiente forma:
