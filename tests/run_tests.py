@@ -2,6 +2,8 @@
 
 from utils import getAllTigerFiles, runTest
 from error_list import error_list
+import sys
+import os
 
 class TestEtapa1():
     folders = ['good', 'syntax', 'type', 'wrong']
@@ -36,8 +38,19 @@ class TestEtapa1():
             print("Expected:", fail['req'])
             print("Output:", fail['output'])
             print("")
-    
+
+    def printMarkDown(self, files_ok, fails):
+        with open(self.md, 'w+') as f:
+            f.write("##Casos de prueba\n\n")
+            f.write("###Pasaron:\n\n")
+            for fi in files_ok:                
+                f.write("- [x] " + os.path.relpath(fi) + "\n")
+            f.write("\n\n##No Pasaron:\n\n")
+            for fi in fails:
+                f.write("- [ ] " + os.path.relpath(fi) + "\n")
+
     def runAll(self):
+        ok    = set()
         fails = []
         files = getAllTigerFiles('.')
         for file in files:
@@ -50,7 +63,18 @@ class TestEtapa1():
                         "output": output,
                         "req": requeriment
                     })
+                else:
+                    ok.union(file)
         self.printFails(fails)
+        self.printMarkDown(ok, fails)
+
+    def __init__(self, markdown_file):
+        self.md = markdown_file
     
 if __name__ == "__main__":
-    TestEtapa1().runAll()
+    DEFAULT_MD_NAME = 'test.md'
+    if len(sys.argv) < 2:
+        TestEtapa1(DEFAULT_MD_NAME).runAll()
+    else:
+        TestEtapa1(sys.argv[1]).runAll()
+    
