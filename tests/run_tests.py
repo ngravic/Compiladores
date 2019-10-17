@@ -18,8 +18,8 @@ class TestEtapa1():
 
     def checkRequeriment(self, requeriment, output):
         if requeriment not in error_list:
-            raise Exception("El requerimiento buscado no esta en la lista " +
-                "de errores. Agregar a error_list")
+            raise Exception("El requerimiento '%s' no esta en la lista " +
+                "de errores. Agregar a error_list" % requeriment)
         for text_req in error_list[requeriment]:
             if text_req not in output:
                 return False
