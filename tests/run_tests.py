@@ -64,7 +64,7 @@ class TestEtapa1():
                         "req": requeriment
                     })
                 else:
-                    ok.union(file)
+                    ok.add(file)
         self.printFails(fails)
         self.printMarkDown(ok, fails)
 
