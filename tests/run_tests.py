@@ -30,7 +30,7 @@ class TestEtapa1():
 
     def printFails(self, fails):
         for fail in fails:
-            fail_t = "FAIL", fail['file']
+            fail_t = "FAIL " + fail['file']
             print(fail_t)
             print('-' * len(fail_t))
             print("Expected:", fail['req'])
