@@ -11,7 +11,7 @@ open List
 
 type expty = {exp: exp, ty: Tipo}
 
-fun inside x (y::ys) = if x = y then true else inside y ys
+fun inside x (y::ys) = if x = y then true else inside x ys
   | inside x [] = false
 
 type venv = (string, EnvEntry) tigertab.Tabla
@@ -74,12 +74,13 @@ fun transExp (venv, tenv) =
           | trexp (OpExp ({left, oper, right}, nl)) =
                 let val {exp = _, ty = tyl} = trexp left
                     val {exp = _, ty = tyr} = trexp right
-                in checkError [tiposIguales tyl tyr] OperandosDistintos "seman78" nl;
+                    val _ = (print "TYL: "; printIType tyl; print " TYR: "; printIType tyr)
+                in checkError [tiposIguales tyl tyr] OperandosDistintos "seman78'" nl;
                    if inside oper [EqOp, NeqOp]
                    then checkError [tyl <> TUnit, tyl <> TNil orelse tyr <> TNil]
-                                   TiposNoComparables "seman78" nl
+                                   TiposNoComparables "seman81" nl
                    else if inside oper [PlusOp, MinusOp, TimesOp, DivideOp]
-                        then checkError [tyl = TInt RW] TiposNoOperables "seman83" nl
+                        then checkError [tiposIguales tyl (TInt RW)] TiposNoOperables "seman83" nl
                         else checkError [tyl = TInt RW orelse tyl = TString]
                                         TiposNoComparables "seman82" nl;
                    {exp = SCAF, ty = TInt RW} end
@@ -184,15 +185,15 @@ fun transExp (venv, tenv) =
       and trdec (venv, tenv) (VarDec ({name, escape, typ, init}, pos)) =
               let val tyinit = #ty (transExp (venv, tenv) init)
                   val tytyp = getOpt ((tabBusca (getOpt (typ, "")) tenv), TUnit) (* VERIFICAR TUNIT *)
-                  val _ = (print ("NOMBRE: " ^ name ^ "\n");
+                  (* val _ = (print ("NOMBRE: " ^ name ^ "\n");
                            print "TINIT: "; (printIType tyinit); print "\n";
-                           print "TYTIP: "; (printIType tytyp); print "\n")
-                  val _ = if isSome typ
-                          then checkError [tiposIguales tyinit tytyp]
-                                          InitIncorrecto "seman183" pos
-                          else checkError [not (tyinit = TNil)]
-                                          AsignacionNil "seman185" pos
-              in (tabRInserta name (Var {ty = tyinit}) venv, tenv, []) end
+                           print "TYTIP: "; (printIType tytyp); print "\n") *)
+              in if isSome typ
+                 then (checkError [tiposIguales tyinit tytyp] InitIncorrecto "seman183" pos;
+                                  ((tabRInserta name (Var {ty = tytyp}) venv), tenv, []))
+                 else (checkError [not (tyinit = TNil)] AsignacionNil "seman185" pos;
+                                  ((tabRInserta name (Var {ty = tyinit}) venv), tenv, []))
+              end
         | trdec (venv, tenv) (FunctionDec fs) = (venv, tenv, []) (*
         
         			(*fs tiene la sigueinte estructura:
