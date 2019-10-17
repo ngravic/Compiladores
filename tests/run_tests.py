@@ -12,7 +12,10 @@ class TestEtapa1():
             line = f.readline()
             if REQUERIMENTS_KW in line:
                 idx = line.index(REQUERIMENTS_KW) + len(REQUERIMENTS_KW)
-                req = line[idx:]
+                if '*/' in line:                    
+                    req = line[idx:line.index('*/')]
+                else:
+                    req = line[idx:]
                 return filter(None, map(lambda x: x.strip(), req.split(' ')))
             return []
 

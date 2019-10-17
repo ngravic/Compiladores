@@ -16,6 +16,6 @@ def runTest(file):
     (out, err) = p.communicate()
     status = p.wait()
     if status == 0:
-        return out
+        return out.decode('utf-8')
     else:
-        return err    
+        return err.decode('utf-8')   
