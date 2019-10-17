@@ -1,0 +1,81 @@
+##Casos de prueba
+
+###Pasaron:
+
+- [x] wrong/operandosdistintos.tig
+- [x] wrong/fnodeclarada.tig
+- [x] type/test28.tig
+- [x] type/test25.tig
+- [x] type/test09.tig
+- [x] good/test03.tig
+- [x] wrong/cantidadargumentos.tig
+- [x] wrong/extremosincorrectos.tig
+- [x] type/test13.tig
+- [x] type/test45.tig
+- [x] wrong/tiposnocomparables2.tig
+- [x] wrong/tipoinexistente.tig
+- [x] wrong/tiposnooperables.tig
+- [x] type/test15.tig
+- [x] good/test08.tig
+- [x] type/test16.tig
+- [x] type/test43.tig
+- [x] type/test26.tig
+- [x] type/fun-vs-var.tig
+- [x] type/test14.tig
+- [x] good/local-vs-global-type.tig
+- [x] type/nil-equal-nil.tig
+- [x] good/test48.tig
+- [x] wrong/tiposnocomparables1.tig
+- [x] type/test24.tig
+- [x] wrong/nofuncion.tig
+- [x] wrong/ifdiferentes.tig
+- [x] type/test20.tig
+- [x] type/test33.tig
+- [x] type/assign-loop-var.tig
+- [x] good/test02.tig
+- [x] good/test12.tig
+- [x] type/test22.tig
+- [x] type/test17.tig
+- [x] wrong/cuerpoincorrecto.tig
+- [x] type/test11.tig
+- [x] type/test29.tig
+- [x] type/test23.tig
+- [x] good/test01.tig
+- [x] good/test50.tig
+- [x] type/test32.tig
+- [x] wrong/norecord.tig
+- [x] good/recursive-comments.tig
+- [x] type/test21.tig
+- [x] type/test10.tig
+- [x] wrong/tiposargumentos.tig
+- [x] type/test19.tig
+- [x] wrong/tiposnocomparables3.tig
+- [x] type/test31.tig
+- [x] good/test30.tig
+- [x] wrong/condicionincorrecta.tig
+- [x] good/test42.tig
+- [x] good/test09.tig
+- [x] good/test37.tig
+- [x] good/test47.tig
+
+
+##No Pasaron:
+
+- [ ] type/test39.tig
+- [ ] type/test18.tig
+- [ ] type/test34.tig
+- [ ] type/test35.tig
+- [ ] type/test38.tig
+- [ ] type/test51.tig
+- [ ] type/test36.tig
+- [ ] type/test40.tig
+- [ ] good/compare-record-and-nil.tig
+- [ ] good/test07.tig
+- [ ] good/queens.tig
+- [ ] good/test06.tig
+- [ ] good/fact.tig
+- [ ] good/merge.tig
+- [ ] good/recursive-types.tig
+- [ ] good/test27.tig
+- [ ] good/test44.tig
+- [ ] good/three-name-spaces.tig
