@@ -108,8 +108,9 @@ fun transExp (venv, tenv) =
                               (VNoDeclarada s) "seman105" nl of
                      Var {ty = TInt RO} => error SoloLectura "seman106" nl
                    | Func _ => error NoVariable "seman110" nl
-                   | _ => checkError [tiposIguales (TInt RW) (#ty (trexp exp))]
-                                     AsignacionIncorrecta "seman109" nl;
+                   | VIntro => error Completar "seman111" nl
+                   | Var {ty = t} => checkError [tiposIguales t (#ty (trexp exp))]
+                                           AsignacionIncorrecta "seman109" nl;
                           {exp = SCAF, ty = TUnit})
           | trexp (AssignExp ({var = (fv as FieldVar (v, s)), exp}, nl)) =
                           let val tipov = #ty (trvar (fv, nl))
@@ -194,68 +195,70 @@ fun transExp (venv, tenv) =
                  else (checkError [not (tyinit = TNil)] AsignacionNil "seman185" pos;
                                   ((tabRInserta name (Var {ty = tyinit}) venv), tenv, []))
               end
-        | trdec (venv, tenv) (FunctionDec fs) = 
-            let 
-                fun aux ({name, params : field list, result, body}, pos)=
+        | trdec (venv, tenv) (FunctionDec fs) =
+            let
+                fun aux (({name, params : field list, result, body}, pos), venv) =
                     let
-                        val typlist = map #name params
                         fun tabBuscaF x y = tabBusca y x
+                        val typlist = map (fn (NameTy x) => x) (map #typ params)
                         val tysearched = map (tabBuscaF tenv) typlist
                         fun getOptnF e c nl opt = getOptn opt e c nl
                         val tyfound = map (getOptnF Completar "seman205" pos) tysearched
-                        (*val tablenetry = Func {level: (), label: tigertemp.newlabel()^name^pos, formals  }*)
-                        in () end
-                    
-            in (venv, tenv, []) 
+                        (* val tyresult = getOptn
+                                       (tabBusca(getOptn result Completar "seman206" pos) tenv)
+                                       Completar "Seman208" pos *)
+                        val tyresult = getOpt (result, "")
+                        val damian = getOpt ((tabBusca tyresult tenv), TNil)
+                        val tableentry = Func {level = (),
+                                               label = tigertemp.newlabel() ^ name ^ (makestring pos),
+                                               formals = tyfound,
+                                               result = damian,
+                                               extern = false }
+                        in tabRInserta name tableentry venv end
+            in (foldr aux venv fs, tenv, [])
             end (*
-        
-        			(*fs tiene la sigueinte estructura:
-				Lista de:
-					Tuplas: 
-						Primer elemento: Record con la declaración de UNA función
-										 Los elementos de ese record son:
-										 	name: symbol 
-											params: field list
-													-Cada field de la lista de parámetros tiene:
-														name: symbol
-														escape: bool ref
-														typ: ty
-											result: symbol option
-											body: exp
-						Segundo elmento: Variable de número de línea. -USAR PARA DEBUG DE error(...)
-			TO DO:
- 			+Primer paso: ARMADO DE LAS INTERFACES DE LAS FUNCIONES:
-				-Hacer una función aux. que construya la interfaz de UNA función dada UNA entrada de la lista fs.
-				 Para ello:
-					 1)Descartar la segunda componente de la tupla (proyección)
-					 2)Del RECORD con la delcaración de esa función descartar body (aún no nos sirve)
-					 3)Obtener el nombre (obtención de un campo de un record)
-					 4)Buscar los parámetros en el entorno de tipos
-					   Para ello:
-							 -De la field (un field es un record) list obtener los campos typ (usar un map)
-							 -De la lista obtenida en el paso anterior, buscar todos los elementos en el
-							  entorno de tipos (usar tabBusca)
-							  Si alguno no se encuentra lanzar una excepción, si no, conservar esta lista (typ list)
-					 5)Obtener el tipo de retorno de la función. (obtención de un campo de un record)
-				 Con lo obtenido en (3), (4) y (5) construir una entrada de la tabla de entorno de variables, es decir
-				 (string, EnvEntry)
-				 Tiene la siguiente forma:
-					 Func {level:(), label: tigertemp.label()^name^pos,formals: tl , result: res, extern: false}
-						 donde:
-							 tl se obtiene de (4)
-							 res se obtiene de (5)
-				 Agregar esta entrada al entorno (usar tabRinserta).
-				
-				-Usar un fold con la función anterior sobre fs para agregar todas las interfaces del batch al entorno.
-			
-			+Segundo paso:TIPADO DE LOS BODY's DE LAS FUNCIONES.
-				-Hacer una función que
-		
-				
-					
+                    (*fs tiene la sigueinte estructura:
+                    Lista de:
+                            Tuplas: 
+                                    Primer elemento: Record con la declaración de UNA función
+                                                                     Los elementos de ese record son:
+                                                                            name: symbol 
+                                                                            params: field list
+                                                                                            -Cada field de la lista de parámetros tiene:
+                                                                                                    name: symbol
+                                                                                                    escape: bool ref
+                                                                                                    typ: ty
+                                                                            result: symbol option
+                                                                            body: exp
+                                    Segundo elmento: Variable de número de línea. -USAR PARA DEBUG DE error(...)
+            TO DO:
+            +Primer paso: ARMADO DE LAS INTERFACES DE LAS FUNCIONES:
+                    -Hacer una función aux. que construya la interfaz de UNA función dada UNA entrada de la lista fs.
+                     Para ello:
+                    [*] 1)Descartar la segunda componente de la tupla (proyección)
+                    [*] 2)Del RECORD con la delcaración de esa función descartar body (aún no nos sirve)
+                    [*] 3)Obtener el nombre (obtención de un campo de un record)
+                    [*] 4)Buscar los parámetros en el entorno de tipos
+                               Para ello:
+                                         [*] -De la field (un field es un record) list obtener los campos typ (usar un map)
+                                         [*] -De la lista obtenida en el paso anterior, buscar todos los elementos en el
+                                              entorno de tipos (usar tabBusca)
+                                              Si alguno no se encuentra lanzar una excepción, si no, conservar esta lista (typ list)
+                    [*] 5)Obtener el tipo de retorno de la función. (obtención de un campo de un record)
+                     Con lo obtenido en (3), (4) y (5) construir una entrada de la tabla de entorno de variables, es decir
+                     (string, EnvEntry)
+                     Tiene la siguiente forma:
+                             Func {level:(), label: tigertemp.label()^name^pos,formals: tl , result: res, extern: false}
+                                     donde:
+                                             tl se obtiene de (4)
+                                             res se obtiene de (5)
+                     Agregar esta entrada al entorno (usar tabRinserta).
+
+                    -Usar un fold con la función anterior sobre fs para agregar todas las interfaces del batch al entorno.
+
+            +Segundo paso:TIPADO DE LOS BODY's DE LAS FUNCIONES.
+                    -Hacer una función que
 *)
-        
-        
          *)
         | trdec (venv, tenv) (TypeDec ts) = (venv, fijaTipos (map #1 ts) tenv, [])
                                             handle Ciclo => error TipoCiclico "seman189" ~1
