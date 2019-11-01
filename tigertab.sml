@@ -8,7 +8,7 @@ exception yaExiste of string
 exception noExiste
 exception noExisteS of string
 
-fun tabNueva () = mkPolyTable (100, noExiste)
+fun tabNueva _ = mkPolyTable (100, noExiste)
 
 fun fromTab t = let val t' = tabNueva ()
                 in apply (fn x => insert t' x) t; t' end
@@ -43,7 +43,7 @@ fun tabRAAplica (f, g, t) = let val l' = rev (listItems t)
                                 t'
                             end
 
-fun tabInserList (t, l) = let val t' = copy t in (List.app (insert t') l; t') end
+fun tabInserList t l = let val t' = copy t in (List.app (insert t') l; t') end
 
 fun tabAList t = listItems t
 

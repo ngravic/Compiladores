@@ -14,7 +14,7 @@ signature tigertab = sig
     val tabAplica : ('a -> 'b) * (''c, 'a) Tabla -> (''c, 'b) Tabla
     val tabAAplica : ('a -> ''c) * ('b -> 'd) * ('a, 'b) Tabla -> (''c, 'd) Tabla
     val tabRAAplica : ('a -> ''b) * ('c -> 'd) * ('a, 'c) Tabla -> (''b, 'd) Tabla
-    val tabInserList : ('a, 'b) Tabla * ('a * 'b) list -> ('a, 'b) Tabla
+    val tabInserList : ('a, 'b) Tabla -> ('a * 'b) list -> ('a, 'b) Tabla
     val tabAList : ('a, 'b) Tabla -> ('a * 'b) list
     val tabFiltra : ('b -> bool) * (''a, 'b) Tabla -> (''a, 'b) Tabla
     val tabPrimer : ('b -> bool) * ('a, 'b) Tabla -> ('a * 'b)
