@@ -65,7 +65,6 @@ fun transExp venv tenv =
           | trexp (OpExp ({left, oper, right}, nl)) =
                 let val {exp = _, ty = tyl} = trexp left
                     val {exp = _, ty = tyr} = trexp right
-                    val _ = (print "TYL: "; printIType tyl; print " TYR: "; printIType tyr)
                 in checkError [tiposIguales tyl tyr] OperandosDistintos "seman69'" nl;
                    if exists (fn x => x = oper) [EqOp, NeqOp]
                    then checkError [tyl <> TUnit, tyl <> TNil orelse tyr <> TNil]
@@ -152,7 +151,6 @@ fun transExp venv tenv =
                   val tyarr = (case tytyp of (TArray (t,_)) => (!t)
                                            | _ => error NoArray "seman153'" nl)
                   val {exp = initxp, ty = tyinit} = trexp init
-                  val _ = (print "TYARR: "; printIType tyarr; print "\nTYINIT: "; printIType tyinit; print "\n")
               in checkError [tiposIguales tysize (TInt RO)] TamanoIncorrecto "seman156" nl;
                  checkError [tiposIguales tyarr tyinit] InitIncorrecto "seman157" nl;
                  {exp = SCAF, ty = tytyp} end
@@ -187,37 +185,36 @@ fun transExp venv tenv =
             let
                 fun namety (NameTy x) = x
                   | namety _ = error ErrorInterno "seman189" ~1
-                fun aux1 (({name, params : field list, result, body}, pos), venv) = (* NOMBRE DE FUNCION *)
+                (* DADA UNA DECLARACION DE FUNCION, LA AGREGA AL ENTORNO *)
+                fun aux1 (({name, params, result, body}, pos), venv) = (* NOMBRE DE FUNCION *)
                      let
-                         val typlist = map namety (map #typ params)
-                         val tysearched = map (fn x => tabBusca x tenv)  typlist
-                         val tyfound = map (fn x => getOptn x Completar "seman194" pos) tysearched
-                         val tyresult = getOpt (result, "")
-                         val damian = getOpt ((tabBusca tyresult tenv), TNil) (* NOMBRE DE VARIABLE *)
-                         val tableentry = Func {level = (),
-                                                label = tigertemp.newlabel() ^ name ^ (makestring pos),
-                                                formals = tyfound,
-                                                result = damian,
-                                                extern = false}
+                         val typlist = map ((fn x => getOptn x Completar "seman194" pos) o
+                                            (fn x => tabBusca x tenv) o
+                                            namety o #typ) params
+                         val tyresult = getOpt ((tabBusca (getOpt (result, "")) tenv), TUnit)
+                         val tableentry = Func {label = tigertemp.newlabel () ^ name ^ (makestring pos),
+                                                formals = typlist, result = tyresult,
+                                                level = (), extern = false}
                      in tabRInserta name tableentry venv end
-                (* DADA UNA FUNCION, AGREGA SUS PARAMETROS AL ENTORNO *)
-                fun aux2 ({name, params : field list, result, body}, pos) venv =
-                     let fun aux3 {name, typ, escape} = (name, getOptn (tabBusca (namety typ) tenv)
-                                                                       Completar "" pos)
-                         val paramlist = map aux3 params
-                     in foldl (fn ((s, t), y : (string, Tipo) tigertab.Tabla)
-                               => tabRInserta s t y) tenv paramlist
+                val newvenv = foldr aux1 venv fs
+                (* DADA UNA DECLARACION DE FUNCION, FABRICA UN ENTORNO CON SUS PARAMETROS AGREGADOS *)
+                fun aux2 ({params, ...}, pos) = (* NOMBRE DE FUNCION *)
+                     let fun makeEntry {name, typ, ...} = (name, Var {ty = (getOptn (tabBusca (namety typ) tenv)
+                                                                       Completar "seman207" pos)})
+                         val tableentrys = map makeEntry params
+                     in foldl (fn ((s, t), e : venv)
+                               => tabRInserta s t e) newvenv tableentrys
                      end
-               val venvxfunction = ListPair.zip (fs, (map aux2 fs))
-               val _ = map (fn (varenv, func) => (transExp varenv tenv) func) (* ACA HAY UN ERROR *)
-            in (foldr aux1 venv fs, tenv, [])
-            end (*
+                val bodys = map (#body o #1) fs
+                val bodyxvenv = ListPair.zip (bodys, (map aux2 fs))
+                val _ = map (fn (body, varenv) => (transExp varenv tenv) body) bodyxvenv (* ACA HAY UN ERROR *)
+            in (newvenv, tenv, []) end (*
                     (*fs tiene la sigueinte estructura:
                     Lista de:
                             Tuplas:
                                     Primer elemento: Record con la declaración de UNA función
                                                                      Los elementos de ese record son:
-                                                                            name: symbol 
+                                                                            name: symbol
                                                                             params: field list
                                                                                             -Cada field de la lista de parámetros tiene:
                                                                                                     name: symbol
