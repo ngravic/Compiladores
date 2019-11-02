@@ -1,4 +1,4 @@
-/* REQUERIMENTS TiposArgumentos */
+/* REQUERIMENTS CantidadArgumentos */
 /* Lo mismo que test36 */
 /* error : formals are more then actuals */
 let

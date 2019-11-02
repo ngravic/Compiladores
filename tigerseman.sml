@@ -5,8 +5,8 @@ open tigersres
 open tigertrans
 open tigertopsort
 open tigererrors
-
-type expty = {exp: exp, ty: Tipo}
+open ListPair
+open List
 
 type venv = (string, EnvEntry) tigertab.Tabla
 type tenv = (string, Tipo) tigertab.Tabla
@@ -37,6 +37,8 @@ val tab_vars : venv = tabInserList (tabNueva ())
         formals = [TInt RW], result = TUnit, extern = true})
     ]
 
+fun uncurry f (x, y) = f x y
+
 fun tiposIguales (TRecord _) TNil = true
   | tiposIguales TNil (TRecord _) = true
   | tiposIguales (TRecord (_, u1)) (TRecord (_, u2 )) = u1 = u2
@@ -50,29 +52,27 @@ fun transExp venv tenv =
           | trexp (NilExp _) = {exp = SCAF, ty = TNil}
           | trexp (IntExp _) = {exp = SCAF, ty = TInt RW}
           | trexp (StringExp _) = {exp = SCAF, ty = TString}
-          | trexp (CallExp ({func, args}, nl)) =
-              let fun argsIguales (x::xs) (y::ys) = tiposIguales x y
-                                                    andalso argsIguales xs ys
-                    | argsIguales [] [] = true
-                    | argsIguales _ _ = error CantidadArgumentos "seman57" nl
-              in case getOptn (tabBusca func venv) (FNoDeclarada func) "seman58" nl of
-                      Func ({formals, result, ...}) =>
-                                if argsIguales formals (map (#ty o trexp) args)
-                                then {exp = SCAF, ty= result}
-                                else error (TiposArgumentos func) "seman62" nl
-                    | _ => error (NoFuncion func) "seman63" nl
-              end
+          | trexp (CallExp ({func, args}, nl)) = (
+              case getOptn (tabBusca func venv) (FNoDeclarada func) "seman54" nl of
+                   Func ({formals, result, ...}) =>
+                       let val pairs = zipEq (formals, (map (#ty o trexp) args))
+                                       handle UnequalLengths => error CantidadArgumentos "seman57" nl
+                       in if all (uncurry tiposIguales) pairs
+                          then {exp = SCAF, ty = result}
+                          else error (TiposArgumentos func) "seman61" nl
+                       end
+                 | _ => error (NoFuncion func) "seman63" nl)
           | trexp (OpExp ({left, oper, right}, nl)) =
                 let val {exp = _, ty = tyl} = trexp left
                     val {exp = _, ty = tyr} = trexp right
-                in checkError [tiposIguales tyl tyr] OperandosDistintos "seman69'" nl;
-                   if exists (fn x => x = oper) [EqOp, NeqOp]
-                   then checkError [tyl <> TUnit, tyl <> TNil orelse tyr <> TNil]
-                                   TiposNoComparables "seman72" nl
+                    val _ = assert [tiposIguales tyl tyr] OperandosDistintos "seman69'" nl;
+                in if exists (fn x => x = oper) [EqOp, NeqOp]
+                   then assert [tyl <> TUnit, tyl <> TNil orelse tyr <> TNil]
+                               TiposNoComparables "seman72" nl
                    else if exists (fn x => x = oper) [PlusOp, MinusOp, TimesOp, DivideOp]
-                        then checkError [tiposIguales tyl (TInt RW)] TiposNoOperables "seman74" nl
-                        else checkError [tyl = TInt RW orelse tyl = TString]
-                                        TiposNoComparables "seman76" nl;
+                        then assert [tiposIguales tyl (TInt RW)] TiposNoOperables "seman74" nl
+                        else assert [tyl = TInt RW orelse tyl = TString]
+                                    TiposNoComparables "seman76" nl;
                    {exp = SCAF, ty = TInt RW} end
           | trexp (RecordExp ({fields, typ}, nl)) =
               let
@@ -85,63 +85,59 @@ fun transExp venv tenv =
                                 | _ => error (NoRecord typ) "seman86" nl
                   (* Verificar que cada campo esté en orden y tenga una expresión del tipo que corresponde *)
                   fun verificar [] [] = ()
-                    | verificar ((s, t, _)::cs) ((sy, {exp, ty})::ds) =
-                          (checkError [s = sy] CamposDistintos "seman90" nl;
-                           checkError [tiposIguales ty (!t)] (TipoCampo s) "seman91" nl;
+                    | verificar ((s, t, _) :: cs) ((sy, {exp, ty}) :: ds) =
+                          (assert [s = sy] CamposDistintos "seman90" nl;
+                           assert [tiposIguales ty (!t)] (TipoCampo s) "seman91" nl;
                            verificar cs ds)
                     | verificar _ _ = error CantidadArgumentos "seman93" nl
-                  val _ = verificar cs tfields
-              in {exp = SCAF, ty = tyr} end
+              in verificar cs tfields; {exp = SCAF, ty = tyr} end
           | trexp (SeqExp (s, nl)) = {exp = SCAF, ty = #ty (hd (rev (map trexp s)))}
           | trexp (AssignExp ({var = SimpleVar s, exp}, nl)) =
-                (case getOptn (tabBusca s venv)
-                              (VNoDeclarada s) "seman99" nl of
-                     Var {ty = TInt RO} => error SoloLectura "seman100" nl
-                   | Func _ => error NoVariable "seman101" nl
-                   | VIntro => error Completar "seman102" nl
-                   | Var {ty = t} => checkError [tiposIguales t (#ty (trexp exp))]
-                                           AsignacionIncorrecta "seman104" nl;
-                          {exp = SCAF, ty = TUnit})
+                (case getOptn (tabBusca s venv) (VNoDeclarada s) "seman99" nl of
+                     Func _ => error NoVariable "seman101" nl
+                   | VIntro => error ErrorInterno "seman102" nl
+                   | Var {ty = TInt RO} => error SoloLectura "seman100" nl
+                   | Var {ty = t} => assert [tiposIguales t (#ty (trexp exp))]
+                                            AsignacionIncorrecta "seman104" nl;
+                                     {exp = SCAF, ty = TUnit})
           | trexp (AssignExp ({var = (fv as FieldVar (v, s)), exp}, nl)) =
-                          let val tipov = #ty (trvar (fv, nl))
-                              val tipoexp = #ty (trexp exp)
-                          in checkError [tiposIguales tipov tipoexp]
-                                        AsignacionIncorrecta "seman110" nl;
-                             {exp = SCAF, ty = tipov} end
+              let val tyv = #ty (trvar (fv, nl))
+                  val tyexp = #ty (trexp exp)
+              in assert [tiposIguales tyv tyexp] AsignacionIncorrecta "seman110" nl;
+                 {exp = SCAF, ty = tyv} end
           (* v es el "identificador" del arreglo, e es el indice, exp es la expresion a asignar *)
           | trexp (AssignExp ({var = (sv as SubscriptVar (v, e)), exp}, nl)) =
-                          let val tipoexp = #ty (trexp exp)
-                              val tipov = #ty (trvar (sv, nl))
-                              val tipoe = #ty (trexp e)
-                          in checkError [tiposIguales tipov tipoexp] AsignacionIncorrecta "seman117" nl;
-                             checkError [tiposIguales tipoe (TInt RW)] IndiceIncorrecto "seman118" nl;
-                             {exp = SCAF, ty = tipov} end
+              let val tyexp = #ty (trexp exp)
+                  val tyv = #ty (trvar (sv, nl))
+                  val tye = #ty (trexp e)
+              in assert [tiposIguales tyv tyexp] AsignacionIncorrecta "seman117" nl;
+                 assert [tiposIguales tye (TInt RW)] IndiceIncorrecto "seman118" nl;
+                 {exp = SCAF, ty = tyv} end
           | trexp (IfExp ({test, then', else'}, nl)) =
-                let val {exp = testexp, ty = tytest} = trexp test
-                    val {exp = thenexp, ty = tythen} = trexp then'
-                    val {exp = elseexp, ty = tyelse} = trexp (getOpt (else', UnitExp ~1))
-                in checkError [tytest = TInt RW] CondicionIncorrecta "seman124" nl;
-                   checkError [tiposIguales tythen tyelse] IfDiferentes "seman125" nl;
-                   {exp = SCAF, ty = tyelse} end
+              let val {exp = testexp, ty = tytest} = trexp test
+                  val {exp = thenexp, ty = tythen} = trexp then'
+                  val {exp = elseexp, ty = tyelse} = trexp (getOpt (else', UnitExp ~1))
+              in assert [tytest = TInt RW] CondicionIncorrecta "seman124" nl;
+                 assert [tiposIguales tythen tyelse] IfDiferentes "seman125" nl;
+                 {exp = SCAF, ty = tyelse} end
           | trexp (WhileExp ({test, body}, nl)) =
-              let
-                  val ttest = #ty (trexp test)
+              let val ttest = #ty (trexp test)
                   val tbody = #ty (trexp body)
-              in checkError [ttest = TInt RW] CondicionIncorrecta "seman131" nl;
-                 checkError [tbody = TUnit] CuerpoIncorrecto "seman132" nl;
+              in assert [ttest = TInt RW] CondicionIncorrecta "seman131" nl;
+                 assert [tbody = TUnit] CuerpoIncorrecto "seman132" nl;
                  {exp = SCAF, ty = TUnit} end
           | trexp (ForExp ({var, escape, lo, hi, body}, nl)) =
               let val newvenv = tabRInserta var (Var {ty = TInt RO}) venv (*Defino un nuevo entorno de trabajo que incluye el iterador declarado*)
                   val {exp = explo, ty = tylo} = trexp lo
                   val {exp = explhi, ty = tyhi} = trexp hi
                   val {exp = expbody, ty = tybody} = (transExp newvenv tenv) body (*Tipado del body con el nuevo entorno de varables, incluye iterador*)
-              in checkError [tiposIguales tylo (TInt RW), tiposIguales tyhi tylo]
-                            ExtremosIncorrectos "seman140" nl;
-                 checkError [tiposIguales tybody TUnit] CuerpoIncorrecto "seman141" nl;
+              in assert [tiposIguales tylo (TInt RW), tiposIguales tyhi tylo]
+                        ExtremosIncorrectos "seman140" nl;
+                 assert [tiposIguales tybody TUnit] CuerpoIncorrecto "seman141" nl;
                  {exp = SCAF, ty = TUnit} end
           | trexp (LetExp ({decs, body}, _)) =
-              let val (venv', tenv', _) = List.foldl (fn (d, (v, t, _)) => trdec (v, t) d)
-                                                     (venv, tenv, []) decs
+              let val (venv', tenv', _) = foldl (fn (d, (v, t, _)) => trdec (v, t) d)
+                                                (venv, tenv, []) decs
                   val {exp = expbody, ty = tybody} = (transExp venv' tenv') body
               in {exp = SCAF, ty = tybody} end
           | trexp (BreakExp nl) = {exp = SCAF, ty = TUnit}
@@ -151,8 +147,8 @@ fun transExp venv tenv =
                   val tyarr = (case tytyp of (TArray (t,_)) => (!t)
                                            | _ => error NoArray "seman153'" nl)
                   val {exp = initxp, ty = tyinit} = trexp init
-              in checkError [tiposIguales tysize (TInt RO)] TamanoIncorrecto "seman156" nl;
-                 checkError [tiposIguales tyarr tyinit] InitIncorrecto "seman157" nl;
+              in assert [tiposIguales tysize (TInt RO)] TamanoIncorrecto "seman156" nl;
+                 assert [tiposIguales tyarr tyinit] InitIncorrecto "seman157" nl;
                  {exp = SCAF, ty = tytyp} end
         and trvar (SimpleVar s, nl) =
                 (case getOptn (tabBusca s venv) (VNoDeclarada s) "seman160" nl of
@@ -169,16 +165,16 @@ fun transExp venv tenv =
           | trvar (SubscriptVar (v, e), nl) =
               let val tye = #ty (trexp e)
                   val tyv = #ty (trvar (v, nl))
-              in checkError [tiposIguales tye (TInt RO)] IndiceIncorrecto "seman174" nl;
+              in assert [tiposIguales tye (TInt RO)] IndiceIncorrecto "seman174" nl;
                  (case tyv of TArray (t, _) => {exp = SCAF, ty = !t}
                             | _ => error NoArray "seman176" nl) end
       and trdec (venv, tenv) (VarDec ({name, escape, typ, init}, pos)) =
               let val tyinit = #ty ((transExp venv tenv) init)
                   val tytyp = getOpt ((tabBusca (getOpt (typ, "")) tenv), TUnit) (* VERIFICAR TUNIT *)
               in if isSome typ
-                 then (checkError [tiposIguales tyinit tytyp] InitIncorrecto "seman181" pos;
+                 then (assert [tiposIguales tyinit tytyp] InitIncorrecto "seman181" pos;
                                   ((tabRInserta name (Var {ty = tytyp}) venv), tenv, []))
-                 else (checkError [not (tyinit = TNil)] AsignacionNil "seman183" pos;
+                 else (assert [not (tyinit = TNil)] AsignacionNil "seman183" pos;
                                   ((tabRInserta name (Var {ty = tyinit}) venv), tenv, []))
               end
         | trdec (venv, tenv) (FunctionDec fs) =
@@ -186,7 +182,7 @@ fun transExp venv tenv =
                 fun namety (NameTy x) = x
                   | namety _ = error ErrorInterno "seman189" ~1
                 (* DADA UNA DECLARACION DE FUNCION, LA AGREGA AL ENTORNO *)
-                fun aux1 (({name, params, result, body}, pos), venv) = (* NOMBRE DE FUNCION *)
+                fun addFun (({name, params, result, body}, pos), venv) =
                      let
                          val typlist = map ((fn x => getOptn x Completar "seman194" pos) o
                                             (fn x => tabBusca x tenv) o
@@ -196,9 +192,9 @@ fun transExp venv tenv =
                                                 formals = typlist, result = tyresult,
                                                 level = (), extern = false}
                      in tabRInserta name tableentry venv end
-                val newvenv = foldr aux1 venv fs
+                val newvenv = foldr addFun venv fs
                 (* DADA UNA DECLARACION DE FUNCION, FABRICA UN ENTORNO CON SUS PARAMETROS AGREGADOS *)
-                fun aux2 ({params, ...}, pos) = (* NOMBRE DE FUNCION *)
+                fun makeEnv ({params, ...}, pos) =
                      let fun makeEntry {name, typ, ...} = (name, Var {ty = (getOptn (tabBusca (namety typ) tenv)
                                                                        Completar "seman207" pos)})
                          val tableentrys = map makeEntry params
@@ -206,8 +202,11 @@ fun transExp venv tenv =
                                => tabRInserta s t e) newvenv tableentrys
                      end
                 val bodys = map (#body o #1) fs
-                val bodyxvenv = ListPair.zip (bodys, (map aux2 fs))
-                val _ = map (fn (body, varenv) => (transExp varenv tenv) body) bodyxvenv (* ACA HAY UN ERROR *)
+                val bodyxvenv = zip (bodys, (map makeEnv fs))
+                val bodytypes = map (fn (body, varenv) => #ty ((transExp varenv tenv) body)) bodyxvenv (* ACA HAY UN ERROR *)
+                val results = map (#result o #1) fs
+                val damian = map (fn ot => getOpt ((tabBusca (getOpt (ot, "")) tenv), TUnit)) results
+                val _ = map (fn (x,y) => if not (tiposIguales x y) then error (RetornoIncorrecto ("","","")) "" ~1 else ()) (zip (bodytypes, damian))
             in (newvenv, tenv, []) end (*
                     (*fs tiene la sigueinte estructura:
                     Lista de:

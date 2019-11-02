@@ -32,6 +32,7 @@ datatype Error = Escape of string
                | NoArray
                | CicloInterrumpido
                | CampoInexistente
+               | RetornoIncorrecto of string * string * string
 
 fun mensaje c = case c of
                 Escape e => "Escape " ^ e ^ " inexistente."
@@ -66,11 +67,12 @@ fun mensaje c = case c of
               | NoArray => "La variable no es un array."
               | CicloInterrumpido => "Batch de declaracion interrumpido"
               | CampoInexistente => "No existe ese campo en el registro."
+              | RetornoIncorrecto (f, e, a) => "La funcion " ^ f ^ " deberia devolver " ^ e ^ " pero devuelve " ^ a ^ "."
 
 fun error e c nl = raise Fail ("\nError en linea " ^ (Int.toString nl) ^
                                ": " ^ (mensaje e) ^ "\nCodigo de error: " ^ c)
 
-fun checkError bs e c nl =
+fun assert bs e c nl =
     if foldl (fn (x, y) => x andalso y) true bs then () else error e c nl
 
 fun getOptn opt e c nl = case opt of NONE => error e c nl
