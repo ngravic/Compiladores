@@ -1,11 +1,11 @@
 /* REQUERIMENTS CantidadArgumentos */
 /* Ver si corresponde FNoDeclarada o algo mas especifico
-	indicando que no existe sobrecarga que soporte la cant
-	de argumentos 
+    indicando que no existe sobrecarga que soporte la cant
+    de argumentos
 */
 /* error : formals are fewer then actuals */
 let
-	function g (a : int , b : string) : int = a
+    function g (a : int , b : string) : int = a
 in
-	g (3,"one",5)
+    g (3,"one",5)
 end
