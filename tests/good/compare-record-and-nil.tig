@@ -1,8 +1,8 @@
 /* REQUERIMENTS OK */
-let 
-	type rectype = {name : string, id : int}
-	var b : rectype := nil
+let
+    type rectype = {name : string, id : int}
+    var b : rectype := nil
 in
-	b = nil;
-	b <> nil
+    b = nil;
+    b <> nil
 end
