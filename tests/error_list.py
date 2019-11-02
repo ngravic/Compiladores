@@ -31,5 +31,6 @@ error_list = {
     "NoArray" : ["La variable no es un array."],
     "CicloInterrumpido" : ["Batch de declaracion interrumpido"],
     "CampoInexistente" : ["No existe ese campo en el registro."],
+    "RetornoIncorrecto" : ["Alguna funcion del batch no devolvio lo que se esperaba."],
     "OK" : ["bien!"]
 }

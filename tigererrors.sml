@@ -1,7 +1,7 @@
 open List
 
 datatype Error = Escape of string
-               | Completar
+               | COMPLETAR
                | CantidadArgumentos
                | TiposArgumentos of string
                | FNoDeclarada of string
@@ -32,11 +32,11 @@ datatype Error = Escape of string
                | NoArray
                | CicloInterrumpido
                | CampoInexistente
-               | RetornoIncorrecto of string * string * string
+               | RetornoIncorrecto
 
 fun mensaje c = case c of
                 Escape e => "Escape " ^ e ^ " inexistente."
-              | Completar => "COMPLETAR."
+              | COMPLETAR => "COMPLETAR."
               | CantidadArgumentos => "No coinciden la cantidad de argumentos."
               | TiposArgumentos f => "No coinciden los tipos de los argumentos de " ^ f ^ "."
               | FNoDeclarada f => "La funcion " ^ f ^ " no fue declarada."
@@ -67,7 +67,7 @@ fun mensaje c = case c of
               | NoArray => "La variable no es un array."
               | CicloInterrumpido => "Batch de declaracion interrumpido"
               | CampoInexistente => "No existe ese campo en el registro."
-              | RetornoIncorrecto (f, e, a) => "La funcion " ^ f ^ " deberia devolver " ^ e ^ " pero devuelve " ^ a ^ "."
+              | RetornoIncorrecto => "Alguna funcion del batch no devolvio lo que se esperaba."
 
 fun error e c nl = raise Fail ("\nError en linea " ^ (Int.toString nl) ^
                                ": " ^ (mensaje e) ^ "\nCodigo de error: " ^ c)

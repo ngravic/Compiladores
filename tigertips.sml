@@ -11,6 +11,14 @@ structure tigertips = struct
                   | TRecord of (string * Tipo ref * int) list * unique
                   | TTipo of string
 
+    fun toString TUnit              = "Unit"
+      | toString TNil               = "Nil"
+      | toString (TInt _)           = "Int"
+      | toString (TString)          = "String"
+      | toString (TArray (t, _))    = "Array of " ^ (toString (!t))
+      | toString (TRecord (lst, _)) = "Record of " ^  concat (map (fn (_,t,_) => toString (!t)) lst)
+      | toString (TTipo t)          = t
+
     fun printIType TUnit              = print "TUnit"
       | printIType TNil               = print "TNil"
       | printIType (TInt _)           = print "TInt"
