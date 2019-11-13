@@ -7,6 +7,9 @@ open tigererrors
 open ListPair
 open List
 
+fun duplicated []      = false
+  | duplicated (n::ns) = (exists (fn x => x = n) ns) orelse (duplicated ns)
+
 type venv = (string, EnvEntry) tigertab.Tabla
 type tenv = (string, Tipo) tigertab.Tabla
 
@@ -79,8 +82,6 @@ fun trdec venv tenv (VarDec ({name, typ, init, ...}, nl)) =
       let val newtenv = (fijaTipos (map #1 ts) tenv
                         handle Ciclo => error TipoCiclico "seman79" ~1
                              | noExiste => error CicloInterrumpido "seman80" ~1)
-          fun duplicated []      = false
-            | duplicated (n::ns) = (exists (fn x => x = n) ns) orelse (duplicated ns)
       in assert [(not o duplicated) (map (#name o #1) ts)] MismoNombre "seman84" ~1;
          (venv, newtenv, []) end
   | trdec venv tenv (FunctionDec fs) =
@@ -108,6 +109,7 @@ fun trdec venv tenv (VarDec ({name, typ, init, ...}, nl)) =
           val tyresults = map (fn r => getAnot r tenv TUnit) results
       in assert [allEq (uncurry tiposIguales) (tybodys, tyresults)]
                 RetornoIncorrecto "seman105" ((#2 o hd) fs);
+         assert [(not o duplicated) (map (#name o #1) fs)] MismoNombre "seman112" ~1;
          (newvenv, tenv, []) end
 
 in case exp of
