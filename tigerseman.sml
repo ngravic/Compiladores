@@ -167,14 +167,14 @@ in case exp of
       let val tyv = #ty (trvar fv nl)
           val tyexp = #ty (trexp venv tenv exp)
       in assert [tiposIguales tyv tyexp] AsignacionIncorrecta "seman162" nl;
-         {exp = SCAF, ty = tyv} end
+         {exp = SCAF, ty = TUnit} end
   | (AssignExp ({var = (sv as SubscriptVar (v, idx)), exp}, nl)) =>
       let val tyexp = #ty (trexp venv tenv exp)
           val tyv = #ty (trvar sv nl)
           val tyidx = #ty (trexp venv tenv idx)
       in assert [tiposIguales tyv tyexp] AsignacionIncorrecta "seman168" nl;
          assert [tiposIguales tyidx (TInt RW)] IndiceIncorrecto "seman169" nl;
-         {exp = SCAF, ty = tyv} end
+         {exp = SCAF, ty = TUnit} end
   | (IfExp ({test, then', else'}, nl)) =>
       let val {exp = testexp, ty = tytest} = trexp venv tenv test
           val {exp = thenexp, ty = tythen} = trexp venv tenv then'
