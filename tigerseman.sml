@@ -75,9 +75,14 @@ fun trdec venv tenv (VarDec ({name, typ, init, ...}, nl)) =
        else (assert [not (tyinit = TNil)] AsignacionNil "seman75" nl;
              ((tabRInserta name (Var {ty = tyinit}) venv), tenv, []))
     end
-  | trdec venv tenv (TypeDec ts) = ((venv, fijaTipos (map #1 ts) tenv, [])
-                                    handle Ciclo => error TipoCiclico "seman79" ~1
-                                      | noExiste => error CicloInterrumpido "seman80" ~1)
+  | trdec venv tenv (TypeDec ts) =
+      let val newtenv = (fijaTipos (map #1 ts) tenv
+                        handle Ciclo => error TipoCiclico "seman79" ~1
+                             | noExiste => error CicloInterrumpido "seman80" ~1)
+          fun duplicated []      = false
+            | duplicated (n::ns) = (exists (fn x => x = n) ns) orelse (duplicated ns)
+      in assert [(not o duplicated) (map (#name o #1) ts)] MismoNombre "seman84" ~1;
+         (venv, newtenv, []) end
   | trdec venv tenv (FunctionDec fs) =
       let fun namety (NameTy x) = x
               | namety _ = error ErrorInterno "seman81" ~1

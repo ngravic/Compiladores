@@ -1,4 +1,4 @@
-/* REQUERIMENTS Completar */
+/* REQUERIMENTS MismoNombre */
 
 /* This is illegal, since there are two functions with the same name
     in the same (consecutive) batch of mutually recursive functions.

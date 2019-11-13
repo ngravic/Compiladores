@@ -1,4 +1,5 @@
 error_list = {
+    "MismoNombre" : ["No se puede declarar dos veces el mismo identificador en un batch."],
     "Escape" : ["Escape ", " inexistente."],
     "FNoDeclarada" : ["La funcion ", " no fue declarada."],
     "NoFuncion" : [" no es una funcion."],
